@@ -1,0 +1,122 @@
+=== STDOUT ===
+======================================================================
+GD V3 PRODUCTION INFERENCE TEST
+======================================================================
+
+Selected production candidate : V3
+Test-set MAE                 : 0.3143
+Test-set RMSE                : 0.4220
+Test-set R2                  : 0.8415
+Test-set Pearson             : 0.9188
+
+Device selected : cuda
+========================================================================
+COGNIVIEW GD ISOLATED EVALUATION
+========================================================================
+Audio input       : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_004322.wav
+Evaluation folder : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_004323
+V3 model          : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+Training scaler   : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/models/scaler.pkl
+Shared dataset    : will not be used for pipeline outputs
+========================================================================
+
+================================================================================
+AI-POWERED INTERVIEW INTELLIGENCE SYSTEM
+================================================================================
+GD PRODUCTION ANALYSIS PIPELINE
+
+Production model : GD Hybrid V3
+Architecture     : BERT + numerical features
+Final scoring    : 70% V3 + 30% analytical
+
+================================================================================
+VALIDATING AUDIO INPUT
+================================================================================
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_004322.wav
+
+Audio size : 0.14 MB
+Audio input : PASS
+
+================================================================================
+VALIDATING PROJECT STRUCTURE
+================================================================================
+Project root : C:\FINAL_YEAR_PROJECT(COGNIVIEW)
+Source dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src
+GD Model dir : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model
+Dataset dir  : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\dataset
+Models dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models
+
+Production model : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models\gd_hybrid_model_v3.pth
+
+Production scaler : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\models\scaler.pkl
+
+Project structure : PASS
+
+================================================================================
+LOADING GD PRODUCTION COMPONENTS
+================================================================================
+All production components loaded successfully.
+
+================================================================================
+STEP 1: SPEAKER DIARIZATION
+================================================================================
+======================================================================
+INITIALIZING GD SPEAKER DIARIZATION
+======================================================================
+
+CUDA available.
+Using GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+Loading speaker diarization model...
+Diarization device: cuda
+
+Speaker diarization model loaded successfully.
+
+Running speaker diarization...
+Computation device: cuda
+This may take some time for the first run.
+
+================================================================================
+GD PRODUCTION PIPELINE FAILED
+================================================================================
+Error : Diarization returned zero segments.
+Elapsed time : 4.81 sec
+
+Pipeline stopped.
+
+=== STDERR ===
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py:9: SyntaxWarning: invalid escape sequence '\G'
+  python .\run_gd_evaluation_isolated.py ".\GD_Model\recordings\session_2\participant_1.wav" 2
+W1024 00:43:37.416000 27836 venv\Lib\site-packages\torch\utils\flop_counter.py:29] triton not found; flop counting will not work for triton kernels
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\pyannote\audio\utils\reproducibility.py:74: ReproducibilityWarning: TensorFloat-32 (TF32) has been disabled as it might lead to reproducibility issues and lower accuracy.
+It can be re-enabled by calling
+   >>> import torch
+   >>> torch.backends.cuda.matmul.allow_tf32 = True
+   >>> torch.backends.cudnn.allow_tf32 = True
+See https://github.com/pyannote/pyannote-audio/issues/1370 for more details.
+
+  warnings.warn(
+Traceback (most recent call last):
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 186, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 152, in main
+    pipeline.main(audio_path=str(audio_path))
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 1591, in main
+    run_diarization(
+    ~~~~~~~~~~~~~~~^
+        components,
+        ^^^^^^^^^^^
+        audio_path
+        ^^^^^^^^^^
+    )
+    ^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 613, in run_diarization
+    raise RuntimeError(
+        "Diarization returned zero segments."
+    )
+RuntimeError: Diarization returned zero segments.

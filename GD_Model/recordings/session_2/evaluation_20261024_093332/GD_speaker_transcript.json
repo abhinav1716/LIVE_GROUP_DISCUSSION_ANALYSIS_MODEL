@@ -1,0 +1,76 @@
+{
+    "aligned_segments": [
+        {
+            "segment_id": 0,
+            "speaker": "SPEAKER_00",
+            "start": 0.0,
+            "end": 2.0,
+            "duration": 2.0,
+            "overlap_ratio": 0.9425,
+            "text": "What is this?"
+        },
+        {
+            "segment_id": 1,
+            "speaker": "SPEAKER_00",
+            "start": 2.0,
+            "end": 4.0,
+            "duration": 2.0,
+            "overlap_ratio": 0.6515,
+            "text": "It's a GD."
+        },
+        {
+            "segment_id": 2,
+            "speaker": "SPEAKER_00",
+            "start": 4.0,
+            "end": 6.0,
+            "duration": 2.0,
+            "overlap_ratio": 1.0,
+            "text": "It's an actual user."
+        },
+        {
+            "segment_id": 3,
+            "speaker": "SPEAKER_00",
+            "start": 6.0,
+            "end": 8.0,
+            "duration": 2.0,
+            "overlap_ratio": 0.4665,
+            "text": "We are AIA agents."
+        }
+    ],
+    "speakers": {
+        "SPEAKER_00": [
+            {
+                "segment_id": 0,
+                "start": 0.0,
+                "end": 2.0,
+                "duration": 2.0,
+                "overlap_ratio": 0.9425,
+                "text": "What is this?"
+            },
+            {
+                "segment_id": 1,
+                "start": 2.0,
+                "end": 4.0,
+                "duration": 2.0,
+                "overlap_ratio": 0.6515,
+                "text": "It's a GD."
+            },
+            {
+                "segment_id": 2,
+                "start": 4.0,
+                "end": 6.0,
+                "duration": 2.0,
+                "overlap_ratio": 1.0,
+                "text": "It's an actual user."
+            },
+            {
+                "segment_id": 3,
+                "start": 6.0,
+                "end": 8.0,
+                "duration": 2.0,
+                "overlap_ratio": 0.4665,
+                "text": "We are AIA agents."
+            }
+        ]
+    }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "gd_rank": 1,
+    "speaker": "SPEAKER_00",
+    "v3_gd_score": 8.59,
+    "participation_score": 10.0,
+    "content_score": 4.73,
+    "communication_score": 7.65,
+    "initiative_score": 7.03,
+    "conclusion_score": 8.5,
+    "turn_taking_score": 7.4,
+    "pause_control_score": 9.4,
+    "analytical_score": 7.77,
+    "final_gd_score": 8.34,
+    "performance_band": "VERY_GOOD",
+    "initiation_flag": 1,
+    "conclusion_flag": 1,
+    "speaking_duration_sec": 7.34,
+    "word_count": 14,
+    "points_raised": 3,
+    "pauses_taken": 1,
+    "avg_pause_duration_sec": 0.7,
+    "total_pause_time_sec": 0.7,
+    "spoke_throughout_gd": 2,
+    "turns": 3,
+    "average_turn_duration_sec": 2.45,
+    "longest_turn_sec": 4.24,
+    "participation_ratio": 1.0,
+    "strengths": [
+      "Initiated the group discussion.",
+      "Contributed to concluding the discussion.",
+      "Maintained strong participation.",
+      "Maintained good pause control."
+    ],
+    "weaknesses": [
+      "Content contribution could be stronger."
+    ],
+    "recommendations": [
+      "Introduce more relevant and clearly developed points."
+    ]
+  }
+]

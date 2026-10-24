@@ -1,0 +1,1160 @@
+=== STDOUT ===
+======================================================================
+GD V3 PRODUCTION INFERENCE TEST
+======================================================================
+
+Selected production candidate : V3
+Test-set MAE                 : 0.3143
+Test-set RMSE                : 0.4220
+Test-set R2                  : 0.8415
+Test-set Pearson             : 0.9188
+
+Device selected : cuda
+========================================================================
+COGNIVIEW GD ISOLATED EVALUATION
+========================================================================
+Audio input       : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_093330.wav
+Evaluation folder : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332
+V3 model          : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+Training scaler   : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/models/scaler.pkl
+Shared dataset    : will not be used for pipeline outputs
+========================================================================
+
+================================================================================
+AI-POWERED INTERVIEW INTELLIGENCE SYSTEM
+================================================================================
+GD PRODUCTION ANALYSIS PIPELINE
+
+Production model : GD Hybrid V3
+Architecture     : BERT + numerical features
+Final scoring    : 70% V3 + 30% analytical
+
+================================================================================
+VALIDATING AUDIO INPUT
+================================================================================
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_093330.wav
+
+Audio size : 0.26 MB
+Audio input : PASS
+
+================================================================================
+VALIDATING PROJECT STRUCTURE
+================================================================================
+Project root : C:\FINAL_YEAR_PROJECT(COGNIVIEW)
+Source dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src
+GD Model dir : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model
+Dataset dir  : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\dataset
+Models dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models
+
+Production model : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models\gd_hybrid_model_v3.pth
+
+Production scaler : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\models\scaler.pkl
+
+Project structure : PASS
+
+================================================================================
+LOADING GD PRODUCTION COMPONENTS
+================================================================================
+All production components loaded successfully.
+
+================================================================================
+STEP 1: SPEAKER DIARIZATION
+================================================================================
+======================================================================
+INITIALIZING GD SPEAKER DIARIZATION
+======================================================================
+
+CUDA available.
+Using GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+Loading speaker diarization model...
+Diarization device: cuda
+
+Speaker diarization model loaded successfully.
+
+Running speaker diarization...
+Computation device: cuda
+This may take some time for the first run.
+
+Diarization saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_diarization_segments.csv
+
+Speakers detected : 1
+Segments detected : 3
+Time : 19.88 sec
+Status : PASS
+
+================================================================================
+STEP 2: DIARIZATION POST-PROCESSING
+================================================================================
+
+Cleaned diarization saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_diarization_cleaned.csv
+Speaker summary saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_speaker_summary.csv
+
+Original segments : 3
+Removed segments  : 0
+Cleaned segments  : 3
+Speakers          : 1
+Time : 0.03 sec
+Status : PASS
+
+================================================================================
+STEP 3: ACOUSTIC SILENCE EXTRACTION
+================================================================================
+
+======================================================================
+LOADING CLEAN WAV AUDIO
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_093330.wav
+
+Sample rate : 16000 Hz
+Samples     : 137280
+Duration    : 8.58 sec
+
+======================================================================
+CALCULATING AUDIO ENERGY
+======================================================================
+RMS energy calculated.
+
+======================================================================
+RUNNING ACOUSTIC SILENCE DETECTION
+======================================================================
+
+Raw acoustic pauses detected: 1
+Merged acoustic pauses: 1
+
+======================================================================
+GD AUDIO ANALYSIS
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_093330.wav
+
+Silence threshold       : 25 dB
+Minimum pause duration : 0.50 sec
+Merge gap               : 0.50 sec
+
+Recording duration       : 8.58 sec
+Estimated speaking time  : 7.88 sec
+Pauses detected          : 1
+Average pause duration   : 0.70 sec
+Total pause time         : 0.70 sec
+
+======================================================================
+DETECTED ACOUSTIC SILENCE REGIONS
+======================================================================
+Pause 01: 6.88s → 7.58s (0.70s)
+
+Acoustic silence CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_acoustic_silences.csv
+Rows written: 1
+
+Silence regions : 1
+Time : 3.60 sec
+Status : PASS
+
+================================================================================
+STEP 4: TIMESTAMPED TRANSCRIPTION
+================================================================================
+======================================================================
+INITIALIZING GD TRANSCRIPTION
+======================================================================
+
+Loading Whisper transcription model...
+
+Whisper model loaded successfully in 3.97 seconds.
+Device       : cuda
+Compute type : float16
+
+
+======================================================================
+RUNNING GD TRANSCRIPTION
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_093330.wav
+
+Generating timestamped transcription...
+
+
+======================================================================
+TRANSCRIPTION COMPLETED
+======================================================================
+
+Detected language : en
+Language probability : 1.0000
+Transcription segments : 4
+Processing time : 15.56 seconds
+
+Transcription saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_transcription.json
+
+Transcription segments : 4
+Time : 19.53 sec
+Status : PASS
+
+================================================================================
+STEP 5: SPEAKER-TRANSCRIPT ALIGNMENT
+================================================================================
+
+Speaker transcript JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_speaker_transcript.json
+Speaker transcript CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_speaker_transcript.csv
+
+Diarization segments : 3
+Transcription segments : 4
+Aligned segments : 4
+Unmatched segments : 0
+Speakers : 1
+Time : 0.04 sec
+Status : PASS
+
+================================================================================
+STEP 6: SPEAKER-LEVEL FEATURE EXTRACTION
+================================================================================
+
+Feature CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_speaker_features.csv
+Feature JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_speaker_features.json
+
+Speaker feature rows : 1
+Time : 0.08 sec
+Status : PASS
+
+================================================================================
+STEP 7: FEATURE FUSION
+================================================================================
+Speaker features loaded : 1
+Diarization segments : 3
+Acoustic silence regions : 1
+
+V4 feature contract validation:
+  points_raised range: 1-5
+  Actual range       : 3-3
+  Points status      : PASS
+
+Pause attribution validation:
+  Intra-speaker pauses : 1
+  Inter-speaker pauses : 0
+  Unattributed pauses  : 0
+  Intra pause time     : 0.70 sec
+  Inter pause time     : 0.00 sec
+  Unattributed time    : 0.00 sec
+  Pause sanity status  : PASS
+
+Fused feature CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_fused_features.csv
+Fused feature JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_fused_features.json
+
+Fused feature rows : 1
+Acoustic silence regions : 1
+Intra-speaker pauses : 1
+Inter-speaker pauses : 0
+Unattributed pauses : 0
+Time : 0.08 sec
+Status : PASS
+
+================================================================================
+STEP 8: INFERENCE PREPROCESSING
+================================================================================
+======================================================================
+GD INFERENCE PREPROCESSING TEST
+======================================================================
+
+======================================================================
+INITIALIZING GD INFERENCE PREPROCESSING
+======================================================================
+
+Loading fused GD features...
+
+Fused rows     : 1
+Fused columns  : 16
+
+======================================================================
+AVAILABLE FUSED FEATURES
+======================================================================
+  speaker
+  initiation_flag
+  conclusion_flag
+  speaking_duration_sec
+  word_count
+  points_raised
+  pauses_taken
+  avg_pause_duration_sec
+  total_pause_time_sec
+  spoke_throughout_gd
+  turns
+  average_turn_duration_sec
+  longest_turn_sec
+  participation_ratio
+  transcript_segments
+  transcript
+
+======================================================================
+VALIDATING V4 FEATURE CONTRACT
+======================================================================
+
+Required V4 features : 9
+Missing features     : 0
+Contract status      : PASS
+
+======================================================================
+VALIDATING NUMERICAL INPUT
+======================================================================
+
+NaN values detected : 0
+Inf values detected : 0
+
+Numerical validation : PASS
+
+V4 points_raised validation:
+  Expected range : 1-5
+  Actual range   : 3-3
+  Status         : PASS
+
+======================================================================
+LOADING TRAINING SCALER
+======================================================================
+
+Scaler file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\models\scaler.pkl
+
+Scaler loaded successfully.
+
+Scaler expected features : 9
+Scaler feature contract : PASS
+
+Scaler feature names detected.
+
+Scaler feature order:
+  1. initiation_flag
+  2. conclusion_flag
+  3. speaking_duration_sec
+  4. word_count
+  5. points_raised
+  6. pauses_taken
+  7. avg_pause_duration_sec
+  8. total_pause_time_sec
+  9. spoke_throughout_gd
+
+Scaler feature order : PASS
+
+======================================================================
+RAW V4 FEATURE SUMMARY
+======================================================================
+
+initiation_flag               mean=      1.0000  min=    1.0000  max=    1.0000
+conclusion_flag               mean=      1.0000  min=    1.0000  max=    1.0000
+speaking_duration_sec         mean=      7.3400  min=    7.3400  max=    7.3400
+word_count                    mean=     14.0000  min=   14.0000  max=   14.0000
+points_raised                 mean=      3.0000  min=    3.0000  max=    3.0000
+pauses_taken                  mean=      1.0000  min=    1.0000  max=    1.0000
+avg_pause_duration_sec        mean=      0.7000  min=    0.7000  max=    0.7000
+total_pause_time_sec          mean=      0.7000  min=    0.7000  max=    0.7000
+spoke_throughout_gd           mean=      2.0000  min=    2.0000  max=    2.0000
+
+======================================================================
+APPLYING TRAINING SCALER
+======================================================================
+
+Transforming inference features...
+Scaling completed successfully.
+
+Scaled numerical validation : PASS
+
+======================================================================
+RAW → SCALED FEATURE COMPARISON
+======================================================================
+
+Feature                               Raw Mean     Scaled Mean
+--------------------------------------------------------------
+initiation_flag                         1.0000          2.2877
+conclusion_flag                         1.0000          2.3423
+speaking_duration_sec                   7.3400         -2.4606
+word_count                             14.0000         -1.9559
+points_raised                           3.0000          0.0682
+pauses_taken                            1.0000         -2.5302
+avg_pause_duration_sec                  0.7000         -1.9069
+total_pause_time_sec                    0.7000         -2.0239
+spoke_throughout_gd                     2.0000          1.6808
+
+======================================================================
+SCALED INFERENCE FEATURE SUMMARY
+======================================================================
+
+initiation_flag
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : 2.2877
+Scaled std     : 0.0000
+Scaled range   : 2.2877 → 2.2877
+
+conclusion_flag
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : 2.3423
+Scaled std     : 0.0000
+Scaled range   : 2.3423 → 2.3423
+
+speaking_duration_sec
+------------------------------------------------------------
+Raw mean       : 7.3400
+Raw range      : 7.3400 → 7.3400
+Scaled mean    : -2.4606
+Scaled std     : 0.0000
+Scaled range   : -2.4606 → -2.4606
+
+word_count
+------------------------------------------------------------
+Raw mean       : 14.0000
+Raw range      : 14.0000 → 14.0000
+Scaled mean    : -1.9559
+Scaled std     : 0.0000
+Scaled range   : -1.9559 → -1.9559
+
+points_raised
+------------------------------------------------------------
+Raw mean       : 3.0000
+Raw range      : 3.0000 → 3.0000
+Scaled mean    : 0.0682
+Scaled std     : 0.0000
+Scaled range   : 0.0682 → 0.0682
+
+pauses_taken
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : -2.5302
+Scaled std     : 0.0000
+Scaled range   : -2.5302 → -2.5302
+
+avg_pause_duration_sec
+------------------------------------------------------------
+Raw mean       : 0.7000
+Raw range      : 0.7000 → 0.7000
+Scaled mean    : -1.9069
+Scaled std     : 0.0000
+Scaled range   : -1.9069 → -1.9069
+
+total_pause_time_sec
+------------------------------------------------------------
+Raw mean       : 0.7000
+Raw range      : 0.7000 → 0.7000
+Scaled mean    : -2.0239
+Scaled std     : 0.0000
+Scaled range   : -2.0239 → -2.0239
+
+spoke_throughout_gd
+------------------------------------------------------------
+Raw mean       : 2.0000
+Raw range      : 2.0000 → 2.0000
+Scaled mean    : 1.6808
+Scaled std     : 0.0000
+Scaled range   : 1.6808 → 1.6808
+
+======================================================================
+INFERENCE PREPROCESSING COMPLETED
+======================================================================
+
+Speakers / inference rows : 1
+
+V4 features scaled        : 9
+Training scaler reused    : YES
+Inference scaling status  : PASS
+
+Scaled CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_inference_features_scaled.csv
+
+Scaled JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_inference_features_scaled.json
+
+======================================================================
+
+Time : 0.19 sec
+Status : PASS
+
+================================================================================
+STEP 9: GD HYBRID MODEL V3 INFERENCE
+================================================================================
+
+======================================================================
+INITIALIZING GD V3 PRODUCTION INFERENCE
+======================================================================
+
+======================================================================
+VALIDATING INPUT FILES
+======================================================================
+Checking Fused GD feature file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_fused_features.csv
+Status : FOUND (0.00 MB)
+Checking Training scaler:
+C:/FINAL_YEAR_PROJECT(COGNIVIEW)/models/scaler.pkl
+Status : FOUND (0.00 MB)
+Checking V3 model:
+C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+Status : FOUND (418.16 MB)
+
+======================================================================
+LOADING FUSED GD FEATURES
+======================================================================
+Fused rows    : 1
+Fused columns : 16
+
+Available columns:
+  speaker
+  initiation_flag
+  conclusion_flag
+  speaking_duration_sec
+  word_count
+  points_raised
+  pauses_taken
+  avg_pause_duration_sec
+  total_pause_time_sec
+  spoke_throughout_gd
+  turns
+  average_turn_duration_sec
+  longest_turn_sec
+  participation_ratio
+  transcript_segments
+  transcript
+
+======================================================================
+VALIDATING V3 INFERENCE FEATURE CONTRACT
+======================================================================
+Required numerical features : 9
+Missing numerical features  : 0
+Feature contract : PASS
+
+======================================================================
+VALIDATING NUMERICAL INPUT
+======================================================================
+NaN values : 0
+Inf values : 0
+Numerical validation : PASS
+
+V3/V4 points_raised validation:
+Expected range : 1-5
+Actual range   : 3-3
+Points status  : PASS
+
+======================================================================
+RAW V4 FEATURE SUMMARY
+======================================================================
+initiation_flag               mean=      1.0000 min=    1.0000 max=    1.0000
+conclusion_flag               mean=      1.0000 min=    1.0000 max=    1.0000
+speaking_duration_sec         mean=      7.3400 min=    7.3400 max=    7.3400
+word_count                    mean=     14.0000 min=   14.0000 max=   14.0000
+points_raised                 mean=      3.0000 min=    3.0000 max=    3.0000
+pauses_taken                  mean=      1.0000 min=    1.0000 max=    1.0000
+avg_pause_duration_sec        mean=      0.7000 min=    0.7000 max=    0.7000
+total_pause_time_sec          mean=      0.7000 min=    0.7000 max=    0.7000
+spoke_throughout_gd           mean=      2.0000 min=    2.0000 max=    2.0000
+
+======================================================================
+LOADING TRAINING SCALER
+======================================================================
+Scaler file:
+C:/FINAL_YEAR_PROJECT(COGNIVIEW)/models/scaler.pkl
+Scaler size : 0.0011 MB
+Scaler loaded successfully.
+
+======================================================================
+VALIDATING TRAINING SCALER
+======================================================================
+Scaler expected features : 9
+Scaler feature names detected.
+
+Scaler feature order:
+  1. initiation_flag
+  2. conclusion_flag
+  3. speaking_duration_sec
+  4. word_count
+  5. points_raised
+  6. pauses_taken
+  7. avg_pause_duration_sec
+  8. total_pause_time_sec
+  9. spoke_throughout_gd
+Scaler feature contract : PASS
+
+======================================================================
+APPLYING TRAINING SCALER
+======================================================================
+Transforming inference features...
+Scaling completed successfully.
+Scaled numerical validation : PASS
+
+======================================================================
+RAW → SCALED FEATURE COMPARISON
+======================================================================
+Feature                                Raw Mean    Scaled Mean
+--------------------------------------------------------------
+initiation_flag                          1.0000         2.2877
+conclusion_flag                          1.0000         2.3423
+speaking_duration_sec                    7.3400        -2.4606
+word_count                              14.0000        -1.9559
+points_raised                            3.0000         0.0682
+pauses_taken                             1.0000        -2.5302
+avg_pause_duration_sec                   0.7000        -1.9069
+total_pause_time_sec                     0.7000        -2.0239
+spoke_throughout_gd                      2.0000         1.6808
+
+======================================================================
+SCALED INFERENCE FEATURE SUMMARY
+======================================================================
+
+initiation_flag
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : 2.2877
+Scaled std     : 0.0000
+Scaled range   : 2.2877 → 2.2877
+
+conclusion_flag
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : 2.3423
+Scaled std     : 0.0000
+Scaled range   : 2.3423 → 2.3423
+
+speaking_duration_sec
+------------------------------------------------------------
+Raw mean       : 7.3400
+Raw range      : 7.3400 → 7.3400
+Scaled mean    : -2.4606
+Scaled std     : 0.0000
+Scaled range   : -2.4606 → -2.4606
+
+word_count
+------------------------------------------------------------
+Raw mean       : 14.0000
+Raw range      : 14.0000 → 14.0000
+Scaled mean    : -1.9559
+Scaled std     : 0.0000
+Scaled range   : -1.9559 → -1.9559
+
+points_raised
+------------------------------------------------------------
+Raw mean       : 3.0000
+Raw range      : 3.0000 → 3.0000
+Scaled mean    : 0.0682
+Scaled std     : 0.0000
+Scaled range   : 0.0682 → 0.0682
+
+pauses_taken
+------------------------------------------------------------
+Raw mean       : 1.0000
+Raw range      : 1.0000 → 1.0000
+Scaled mean    : -2.5302
+Scaled std     : 0.0000
+Scaled range   : -2.5302 → -2.5302
+
+avg_pause_duration_sec
+------------------------------------------------------------
+Raw mean       : 0.7000
+Raw range      : 0.7000 → 0.7000
+Scaled mean    : -1.9069
+Scaled std     : 0.0000
+Scaled range   : -1.9069 → -1.9069
+
+total_pause_time_sec
+------------------------------------------------------------
+Raw mean       : 0.7000
+Raw range      : 0.7000 → 0.7000
+Scaled mean    : -2.0239
+Scaled std     : 0.0000
+Scaled range   : -2.0239 → -2.0239
+
+spoke_throughout_gd
+------------------------------------------------------------
+Raw mean       : 2.0000
+Raw range      : 2.0000 → 2.0000
+Scaled mean    : 1.6808
+Scaled std     : 0.0000
+Scaled range   : 1.6808 → 1.6808
+
+======================================================================
+LOADING BERT TOKENIZER
+======================================================================
+Tokenizer : bert-base-uncased
+Vocabulary size : 30522
+
+======================================================================
+LOADING V3 MODEL
+======================================================================
+Checking V3 model:
+C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+Status : FOUND (418.16 MB)
+
+Model file:
+C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+
+Initializing EXACT GDHybridModel from model.py...
+Checkpoint type : OrderedDict
+Checkpoint format : direct state_dict
+Missing keys    : 0
+Unexpected keys : 0
+
+V3 model loaded successfully.
+
+======================================================================
+VALIDATING V3 MODEL ARCHITECTURE
+======================================================================
+numeric_network.0.weight           (64, 9)             expected=(64, 9)             PASS
+numeric_network.3.weight           (32, 64)            expected=(32, 64)            PASS
+fusion_layer.0.weight              (128, 800)          expected=(128, 800)          PASS
+fusion_layer.3.weight              (64, 128)           expected=(64, 128)           PASS
+regressor.weight                   (1, 64)             expected=(1, 64)             PASS
+
+V3 architecture validation : PASS
+BERT representation : pooler_output
+BERT parameters     : FROZEN
+
+======================================================================
+TOKENIZING SPEAKER TRANSCRIPTS
+======================================================================
+Texts to tokenize : 1
+Input tensor shape      : (1, 26)
+Attention tensor shape  : (1, 26)
+Numerical tensor shape : (1, 9)
+
+======================================================================
+RUNNING V3 HYBRID INFERENCE
+======================================================================
+Running model forward pass...
+Forward pass completed.
+
+======================================================================
+VALIDATING MODEL OUTPUT
+======================================================================
+Prediction count : 1
+NaN predictions  : 0
+Inf predictions  : 0
+Prediction validation : PASS
+
+Raw V3 prediction statistics:
+Min     : 8.587567
+Max     : 8.587567
+Mean    : 8.587567
+Median  : 8.587567
+Std     : 0.000000
+
+======================================================================
+CREATING V3 PREDICTION RESULTS
+======================================================================
+
+======================================================================
+FINAL GD V3 PREDICTIONS
+======================================================================
+
+SPEAKER_00
+----------------------------------------------------------------------
+GD score              : 8.59
+Score band            : VERY_GOOD
+Initiation flag       : 1
+Conclusion flag       : 1
+Speaking duration     : 7.34 sec
+Word count            : 14
+Points raised         : 3 / 5
+Pauses taken          : 1
+Average pause         : 0.70 sec
+Total pause time      : 0.70 sec
+Participation ratio   : 1.0000
+Turns                 : 3
+Average turn duration : 2.45 sec
+Longest turn          : 4.24 sec
+
+======================================================================
+V3 INFERENCE SUMMARY
+======================================================================
+Speakers evaluated : 1
+Mean GD score      : 8.59
+Minimum GD score   : 8.59
+Maximum GD score   : 8.59
+Median GD score    : 8.59
+
+======================================================================
+SAVING V3 PREDICTIONS
+======================================================================
+Prediction CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_v3_predictions.csv
+Prediction JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_v3_predictions.json
+
+======================================================================
+GD V3 INFERENCE COMPLETED
+======================================================================
+
+V3 inference status       : PASS
+Production candidate     : V3
+Raw feature preservation : YES
+Training scaler reused   : YES
+V4 numerical contract    : PASS
+BERT representation      : pooler_output
+BERT frozen              : YES
+
+
+Production model : GD Hybrid V3
+Model : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models\gd_hybrid_model_v3.pth
+Time : 10.20 sec
+Status : PASS
+
+================================================================================
+STEP 10: FINAL GD EVALUATION
+================================================================================
+
+======================================================================
+GD FINAL EVALUATION TEST
+======================================================================
+Production model : V3
+Primary score    : V3 neural model prediction
+Analytical layer : interpretable behavioral metrics
+Final score      : 70% V3 + 30% analytical
+
+======================================================================
+LOADING GD FINAL EVALUATION DATA
+======================================================================
+V3 predictions :
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_v3_predictions.csv
+
+Fused features :
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_fused_features.csv
+
+V3 prediction rows : 1
+Fused feature rows : 1
+
+======================================================================
+MERGING V3 PREDICTIONS WITH FUSED FEATURES
+======================================================================
+Detected V3 score column : gd_score
+Merged rows : 1
+Missing V3 scores : 0
+
+======================================================================
+VALIDATING FINAL EVALUATION FEATURES
+======================================================================
+Required features : 13
+Missing features  : 0
+NaN values : 0
+Inf values : 0
+
+Points raised range : 3.00 → 3.00
+Feature contract : PASS
+Numerical validation : PASS
+
+======================================================================
+CALCULATING PARTICIPANT EVALUATIONS
+======================================================================
+Group maximum speaking duration : 7.34 sec
+Group maximum turns             : 3
+Group maximum participation     : 1.0000
+
+======================================================================
+RANKING GD PARTICIPANTS
+======================================================================
+
+FINAL GD RANKING
+----------------------------------------------------------------------
+ 1. SPEAKER_00      Final=8.34 V3=8.59 Band=VERY_GOOD
+
+======================================================================
+VALIDATING FINAL GD OUTPUT
+======================================================================
+Output column contract : PASS
+Score range validation  : PASS
+Ranking validation      : PASS
+
+======================================================================
+FINAL GD PARTICIPANT EVALUATION
+======================================================================
+
+SPEAKER_00
+----------------------------------------------------------------------
+GD Rank          : 1
+V3 Model Score   : 8.59
+Analytical Score : 7.77
+Final GD Score   : 8.34/10
+Performance Band : VERY_GOOD
+
+Dimension Scores
+  Participation  : 10.00
+  Content        : 4.73
+  Communication  : 7.65
+  Initiative     : 7.03
+  Conclusion     : 8.50
+  Turn-taking    : 7.40
+  Pause Control  : 9.40
+
+Strengths:
+  + Initiated the group discussion.
+  + Contributed to concluding the discussion.
+  + Maintained strong participation.
+  + Maintained good pause control.
+
+Weaknesses:
+  - Content contribution could be stronger.
+
+Recommendations:
+  > Introduce more relevant and clearly developed points.
+
+======================================================================
+GD FINAL EVALUATION SUMMARY
+======================================================================
+Participants evaluated : 1
+Mean final score       : 8.34
+Minimum final score    : 8.34
+Maximum final score    : 8.34
+Median final score     : 8.34
+
+Top participant:
+  SPEAKER_00 with 8.34/10
+  V3 model score : 8.59
+  Analytical     : 7.77
+  Band           : VERY_GOOD
+
+Final evaluation CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.csv
+
+Final evaluation JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.json
+
+======================================================================
+GD FINAL EVALUATION COMPLETED
+======================================================================
+Status           : PASS
+Production model : V3
+Participants     : 1
+
+Final CSV:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.csv
+
+Final JSON:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.json
+
+V3 contribution      : 70%
+Analytical contribution : 30%
+Time : 0.11 sec
+Status : PASS
+
+================================================================================
+STEP 11: APPLICATION-READY REPORT GENERATION
+================================================================================
+
+======================================================================
+GD REPORT GENERATOR
+======================================================================
+Production model : V3
+Input            : GD_final_evaluation.json
+Output           : Application-ready GD report
+
+======================================================================
+LOADING GD FINAL EVALUATION
+======================================================================
+Input file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.json
+Participants loaded : 1
+
+======================================================================
+CREATING PARTICIPANT REPORTS
+======================================================================
+
+======================================================================
+CREATING GD GROUP SUMMARY
+======================================================================
+Participants evaluated : 1
+Mean final score       : 8.34
+Top participant        : SPEAKER_00
+Top score              : 8.34
+
+======================================================================
+VALIDATING GD REPORT
+======================================================================
+Top-level contract : PASS
+Score validation    : PASS
+Ranking validation  : PASS
+Report validation   : PASS
+
+======================================================================
+FINAL GD REPORT
+======================================================================
+
+GD SESSION SUMMARY
+----------------------------------------------------------------------
+Participants       : 1
+Average score      : 8.34
+Minimum score      : 8.34
+Maximum score      : 8.34
+Median score       : 8.34
+
+GD RANKING
+----------------------------------------------------------------------
+ 1. SPEAKER_00      8.34/10 VERY_GOOD
+
+======================================================================
+PARTICIPANT REPORT: SPEAKER_00
+======================================================================
+Rank              : 1
+Final GD Score     : 8.34/10
+Performance        : VERY_GOOD
+V3 Model Score     : 8.59
+Analytical Score   : 7.77
+
+Dimension Scores
+  Participation       : 10.00
+  Content             : 4.73
+  Communication       : 7.65
+  Initiative          : 7.03
+  Conclusion          : 8.50
+  Turn Taking         : 7.40
+  Pause Control       : 9.40
+
+Strengths
+  + Initiated the group discussion.
+  + Contributed to concluding the discussion.
+  + Maintained strong participation.
+  + Maintained good pause control.
+
+Areas for Improvement
+  - Content contribution could be stronger.
+
+Recommendations
+  > Introduce more relevant and clearly developed points.
+
+Participant report JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.json
+
+Group summary JSON saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_group_summary.json
+
+Participant report CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.csv
+
+======================================================================
+GD REPORT GENERATION COMPLETED
+======================================================================
+Status           : PASS
+Production model : V3
+Participants     : 1
+
+Report JSON:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.json
+
+Group Summary:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_group_summary.json
+
+Report CSV:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.csv
+
+Report : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.json
+Group summary : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_group_summary.json
+Time : 0.05 sec
+Status : PASS
+
+================================================================================
+STEP 12: FINAL OUTPUT VALIDATION
+================================================================================
+
+raw_diarization               : FOUND
+cleaned_diarization           : FOUND
+speaker_summary               : FOUND
+acoustic_silences             : FOUND
+transcription                 : FOUND
+speaker_transcript_json       : FOUND
+speaker_transcript_csv        : FOUND
+speaker_features              : FOUND
+speaker_features_json         : FOUND
+fused_features                : FOUND
+fused_features_json           : FOUND
+scaled_features               : FOUND
+scaled_features_json          : FOUND
+v3_predictions                : FOUND
+v3_predictions_json           : FOUND
+final_evaluation              : FOUND
+final_evaluation_json         : FOUND
+report                        : FOUND
+report_csv                    : FOUND
+group_summary                 : FOUND
+
+Final output validation : PASS
+
+Timing report saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_pipeline_timing.json
+
+================================================================================
+GD PRODUCTION PIPELINE COMPLETED
+================================================================================
+Status           : PASS
+Production model : V3
+Architecture     : BERT + numerical features
+Final scoring    : 70% V3 + 30% analytical
+Total time       : 53.88 sec
+
+FINAL APPLICATION OUTPUTS
+--------------------------------------------------------------------------------
+GD report:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_report.json
+
+Group summary:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_group_summary.json
+
+Final evaluation:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_final_evaluation.csv
+
+V3 predictions:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_v3_predictions.csv
+
+Timing report:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332\GD_pipeline_timing.json
+
+The complete GD analysis is ready for application integration.
+
+========================================================================
+EVALUATION OUTPUT CHECK: PASS
+All key outputs are in: C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_093332
+The shared GD_Model\dataset directory was not redirected or restored.
+========================================================================
+
+=== STDERR ===
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py:9: SyntaxWarning: invalid escape sequence '\G'
+  python .\run_gd_evaluation_isolated.py ".\GD_Model\recordings\session_2\participant_1.wav" 2
+W1024 09:36:02.302000 29636 venv\Lib\site-packages\torch\utils\flop_counter.py:29] triton not found; flop counting will not work for triton kernels
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\pyannote\audio\utils\reproducibility.py:74: ReproducibilityWarning: TensorFloat-32 (TF32) has been disabled as it might lead to reproducibility issues and lower accuracy.
+It can be re-enabled by calling
+   >>> import torch
+   >>> torch.backends.cuda.matmul.allow_tf32 = True
+   >>> torch.backends.cudnn.allow_tf32 = True
+See https://github.com/pyannote/pyannote-audio/issues/1370 for more details.
+
+  warnings.warn(
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\pyannote\audio\models\blocks\pooling.py:103: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\ReduceOps.cpp:1858.)
+  std = sequences.std(dim=-1, correction=1)
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:  51%|█████     | 101/199 [00:00<00:00, 990.98it/s]
+Loading weights: 100%|██████████| 199/199 [00:00<00:00, 1569.21it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.

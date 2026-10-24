@@ -1,0 +1,20 @@
+[
+    {
+        "speaker": "SPEAKER_00",
+        "initiation_flag": 1,
+        "conclusion_flag": 1,
+        "speaking_duration_sec": 7.34,
+        "word_count": 14,
+        "points_raised": 3,
+        "pauses_taken": 1,
+        "avg_pause_duration_sec": 0.7,
+        "total_pause_time_sec": 0.7,
+        "spoke_throughout_gd": 2,
+        "turns": 3,
+        "average_turn_duration_sec": 2.45,
+        "longest_turn_sec": 4.24,
+        "participation_ratio": 1.0,
+        "transcript_segments": 4,
+        "transcript": "What is this? It's a GD. It's an actual user. We are AIA agents."
+    }
+]

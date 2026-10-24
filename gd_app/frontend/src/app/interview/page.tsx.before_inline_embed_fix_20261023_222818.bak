@@ -1,0 +1,49 @@
+"use client";
+
+import { useState } from "react";
+
+/**
+ * Cogniview interview module embedded as a child route of the main app.
+ * The interview service must be running at NEXT_PUBLIC_INTERVIEW_URL (default: 127.0.0.1:8001).
+ */
+export default function InterviewPage() {
+  const [loaded, setLoaded] = useState(false);
+  const interviewUrl = process.env.NEXT_PUBLIC_INTERVIEW_URL || "http://127.0.0.1:8001/";
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Cogniview · Interview Intelligence</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">AI Mock Interview</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Your personalized interview workspace, inside the main Cogniview application.</p>
+          </div>
+          <a href="/" className="inline-flex items-center rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium transition hover:bg-muted">
+            ← Back to Cogniview
+          </a>
+        </div>
+
+        <div className="relative min-h-[72vh] overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          {!loaded && (
+            <div className="absolute inset-0 z-10 flex min-h-[72vh] items-center justify-center bg-background p-6 text-center">
+              <div>
+                <div className="mx-auto mb-3 size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+                <p className="font-medium">Connecting to the interview workspace…</p>
+                <p className="mt-2 text-sm text-muted-foreground">Make sure the interview service is running on port 8001.</p>
+              </div>
+            </div>
+          )}
+          <iframe
+            title="Cogniview AI Mock Interview"
+            src={interviewUrl}
+            className="block h-[78vh] min-h-[680px] w-full border-0 bg-background"
+            onLoad={() => setLoaded(true)}
+            allow="camera; microphone; autoplay; fullscreen; display-capture"
+            allowFullScreen
+          />
+        </div>
+      </section>
+    </main>
+  );
+}

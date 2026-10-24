@@ -1,0 +1,2 @@
+speaker,initiation_flag,conclusion_flag,speaking_duration_sec,word_count,points_raised,pauses_taken,avg_pause_duration_sec,total_pause_time_sec,spoke_throughout_gd,turns,average_turn_duration_sec,longest_turn_sec,participation_ratio,transcript_segments,transcript,gd_score,score_band
+SPEAKER_00,1,1,7.34,14,3,1,0.7,0.7,2,3,2.45,4.24,1.0,4,What is this? It's a GD. It's an actual user. We are AIA agents.,8.587567,VERY_GOOD

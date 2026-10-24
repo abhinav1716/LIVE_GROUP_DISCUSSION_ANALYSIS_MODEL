@@ -1,0 +1,25 @@
+{
+    "aligned_segments": [
+        {
+            "segment_id": 0,
+            "speaker": "SPEAKER_00",
+            "start": 0.0,
+            "end": 10.0,
+            "duration": 10.0,
+            "overlap_ratio": 0.869,
+            "text": "There will be other participants also joining here after that session gets end up to 20 minutes."
+        }
+    ],
+    "speakers": {
+        "SPEAKER_00": [
+            {
+                "segment_id": 0,
+                "start": 0.0,
+                "end": 10.0,
+                "duration": 10.0,
+                "overlap_ratio": 0.869,
+                "text": "There will be other participants also joining here after that session gets end up to 20 minutes."
+            }
+        ]
+    }
+}

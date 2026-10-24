@@ -1,0 +1,87 @@
+{
+  "report_type": "GD_INTERVIEW_EVALUATION",
+  "report_version": "1.0",
+  "production_model": "V3",
+  "scoring_method": "70% V3 neural model + 30% analytical evaluation",
+  "participants": [
+    {
+      "speaker": "SPEAKER_00",
+      "rank": 1,
+      "performance_band": "GOOD",
+      "scores": {
+        "final_gd_score": 7.7,
+        "v3_model_score": 8.25,
+        "analytical_score": 6.42
+      },
+      "dimension_scores": {
+        "participation": 10.0,
+        "content": 1.78,
+        "communication": 6.38,
+        "initiative": 5.09,
+        "conclusion": 7.0,
+        "turn_taking": 6.5,
+        "pause_control": 8.6
+      },
+      "behavioral_metrics": {
+        "speaking_duration_sec": 8.69,
+        "word_count": 17,
+        "points_raised": 1,
+        "pauses_taken": 0,
+        "avg_pause_duration_sec": 0.0,
+        "total_pause_time_sec": 0.0,
+        "turns": 1,
+        "average_turn_duration_sec": 8.69,
+        "longest_turn_sec": 8.69,
+        "participation_ratio": 1.0,
+        "initiation_flag": 1,
+        "conclusion_flag": 1,
+        "spoke_throughout_gd": 2
+      },
+      "strengths": [
+        "Initiated the group discussion.",
+        "Contributed to concluding the discussion.",
+        "Maintained strong participation.",
+        "Maintained good pause control."
+      ],
+      "weaknesses": [
+        "Content contribution could be stronger."
+      ],
+      "recommendations": [
+        "Introduce more relevant and clearly developed points."
+      ]
+    }
+  ],
+  "group_summary": {
+    "participants_evaluated": 1,
+    "score_statistics": {
+      "mean": 7.7,
+      "minimum": 7.7,
+      "maximum": 7.7,
+      "median": 7.7
+    },
+    "model_statistics": {
+      "mean_v3_score": 8.25,
+      "mean_analytical_score": 6.42
+    },
+    "top_participant": {
+      "speaker": "SPEAKER_00",
+      "score": 7.7,
+      "rank": 1,
+      "performance_band": "GOOD"
+    },
+    "lowest_participant": {
+      "speaker": "SPEAKER_00",
+      "score": 7.7,
+      "rank": 1,
+      "performance_band": "GOOD"
+    },
+    "ranking": [
+      {
+        "rank": 1,
+        "speaker": "SPEAKER_00",
+        "final_score": 7.7,
+        "performance_band": "GOOD"
+      }
+    ]
+  }
+}

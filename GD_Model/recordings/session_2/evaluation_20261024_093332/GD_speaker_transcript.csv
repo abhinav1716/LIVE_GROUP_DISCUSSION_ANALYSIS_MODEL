@@ -1,0 +1,5 @@
+segment_id,speaker,start,end,duration,overlap_ratio,text
+0,SPEAKER_00,0.0,2.0,2.0,0.9425,What is this?
+1,SPEAKER_00,2.0,4.0,2.0,0.6515,It's a GD.
+2,SPEAKER_00,4.0,6.0,2.0,1.0,It's an actual user.
+3,SPEAKER_00,6.0,8.0,2.0,0.4665,We are AIA agents.

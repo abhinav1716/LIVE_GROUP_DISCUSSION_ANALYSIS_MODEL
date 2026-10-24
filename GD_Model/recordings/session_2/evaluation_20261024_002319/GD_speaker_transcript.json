@@ -1,0 +1,42 @@
+{
+    "aligned_segments": [
+        {
+            "segment_id": 0,
+            "speaker": "SPEAKER_00",
+            "start": 5.17,
+            "end": 12.69,
+            "duration": 7.52,
+            "overlap_ratio": 0.9564,
+            "text": "AI is the future because I think it has really good positive things to do with and all the"
+        },
+        {
+            "segment_id": 1,
+            "speaker": "SPEAKER_00",
+            "start": 12.69,
+            "end": 14.45,
+            "duration": 1.76,
+            "overlap_ratio": 1.0,
+            "text": "good things can be done with AI."
+        }
+    ],
+    "speakers": {
+        "SPEAKER_00": [
+            {
+                "segment_id": 0,
+                "start": 5.17,
+                "end": 12.69,
+                "duration": 7.52,
+                "overlap_ratio": 0.9564,
+                "text": "AI is the future because I think it has really good positive things to do with and all the"
+            },
+            {
+                "segment_id": 1,
+                "start": 12.69,
+                "end": 14.45,
+                "duration": 1.76,
+                "overlap_ratio": 1.0,
+                "text": "good things can be done with AI."
+            }
+        ]
+    }
+}

@@ -1,0 +1,61 @@
+export default function InterviewPage() {
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#070b14",
+        color: "#f8fafc",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <header
+        style={{
+          minHeight: "62px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+          padding: "12px 20px",
+          borderBottom: "1px solid #1e293b",
+          background: "#0b1220",
+          flexWrap: "wrap",
+        }}
+      >
+        <a
+          href="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            color: "#cbd5e1",
+            textDecoration: "none",
+            fontWeight: 650,
+            fontSize: "14px",
+          }}
+        >
+          <span aria-hidden="true">←</span> Back to Cogniview
+        </a>
+        <div style={{ fontSize: "13px", color: "#94a3b8" }}>
+          AI Mock Interview <span style={{ color: "#475569" }}>·</span> Interview workspace
+        </div>
+      </header>
+
+      <iframe
+        src="http://127.0.0.1:8001/"
+        title="Cogniview AI Mock Interview"
+        allow="camera; microphone; autoplay; fullscreen"
+        allowFullScreen
+        style={{
+          display: "block",
+          width: "100%",
+          height: "calc(100vh - 63px)",
+          minHeight: "620px",
+          border: 0,
+          background: "#080c14",
+        }}
+      />
+    </main>
+  );
+}

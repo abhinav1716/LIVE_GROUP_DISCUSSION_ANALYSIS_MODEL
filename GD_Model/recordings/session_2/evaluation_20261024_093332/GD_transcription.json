@@ -1,0 +1,34 @@
+{
+    "model": "small",
+    "language": "en",
+    "segments": [
+        {
+            "segment_id": 0,
+            "start": 0.0,
+            "end": 2.0,
+            "duration": 2.0,
+            "text": "What is this?"
+        },
+        {
+            "segment_id": 1,
+            "start": 2.0,
+            "end": 4.0,
+            "duration": 2.0,
+            "text": "It's a GD."
+        },
+        {
+            "segment_id": 2,
+            "start": 4.0,
+            "end": 6.0,
+            "duration": 2.0,
+            "text": "It's an actual user."
+        },
+        {
+            "segment_id": 3,
+            "start": 6.0,
+            "end": 8.0,
+            "duration": 2.0,
+            "text": "We are AIA agents."
+        }
+    ]
+}

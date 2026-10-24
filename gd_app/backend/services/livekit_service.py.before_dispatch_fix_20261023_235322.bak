@@ -1,0 +1,92 @@
+import os
+from datetime import timedelta
+
+from livekit import api
+
+
+def generate_participant_token(
+    *,
+    room_name: str,
+    participant_identity: str,
+    participant_name: str,
+) -> str:
+    api_key = os.getenv("LIVEKIT_API_KEY")
+    api_secret = os.getenv("LIVEKIT_API_SECRET")
+
+    if not api_key or not api_secret:
+        raise RuntimeError(
+            "LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be configured."
+        )
+
+    token = (
+        api.AccessToken(api_key, api_secret)
+        .with_identity(participant_identity)
+        .with_name(participant_name)
+        .with_ttl(timedelta(hours=2))
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room=room_name,
+                can_publish=True,
+                can_subscribe=True,
+                can_publish_data=True,
+            )
+        )
+    )
+
+    return token.to_jwt()
+
+# COGNIVIEW_GD_AI_AGENT_DISPATCH_V1
+# Dispatch a real LiveKit Agents worker into the same room as GD participants.
+import json
+import logging
+
+
+GD_AI_AGENT_NAME = "cogniview-gd-agent"
+_gd_ai_logger = logging.getLogger("cogniview.gd_ai_dispatch")
+
+
+async def ensure_gd_ai_agent_dispatched(*, room_name: str, session_id: int, topic: str) -> None:
+    """Create one active AI-agent dispatch for this GD room, avoiding duplicates."""
+    api_key = os.getenv("LIVEKIT_API_KEY")
+    api_secret = os.getenv("LIVEKIT_API_SECRET")
+    livekit_url = os.getenv("LIVEKIT_URL")
+    if not api_key or not api_secret or not livekit_url:
+        raise RuntimeError(
+            "LIVEKIT_API_KEY, LIVEKIT_API_SECRET, and LIVEKIT_URL must be configured to dispatch the GD AI agent."
+        )
+
+    async with api.LiveKitAPI() as lkapi:
+        result = await lkapi.agent_dispatch.list_dispatch(room_name)
+        dispatches = getattr(result, "agent_dispatches", result)
+
+        for existing in dispatches or []:
+            if getattr(existing, "agent_name", "") != GD_AI_AGENT_NAME:
+                continue
+            if int(getattr(existing, "deleted_at", 0) or 0) != 0:
+                continue
+
+            state = getattr(existing, "state", None)
+            jobs = getattr(state, "jobs", None) or []
+            statuses = [
+                str(getattr(getattr(job, "state", None), "status", "")).upper()
+                for job in jobs
+            ]
+            # A missing job list may be returned while dispatch is still being assigned.
+            if not jobs or any("PENDING" in status or "RUNNING" in status for status in statuses):
+                _gd_ai_logger.info("GD AI dispatch already exists for %s", room_name)
+                return
+
+        metadata = json.dumps(
+            {"session_id": session_id, "topic": topic},
+            ensure_ascii=False,
+        )
+        await lkapi.agent_dispatch.create_dispatch(
+            api.CreateAgentDispatchRequest(
+                agent_name=GD_AI_AGENT_NAME,
+                room=room_name,
+                metadata=metadata,
+            )
+        )
+        _gd_ai_logger.info("Dispatched %s to room %s", GD_AI_AGENT_NAME, room_name)
+

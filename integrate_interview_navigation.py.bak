@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+from pathlib import Path
+import shutil
+import sys
+
+
+NAV_OLD = '''          <div style={styles.statusPill}>
+            <span style={styles.statusDot} />
+            {getStatusLabel()}
+          </div>'''
+
+NAV_NEW = '''          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <a
+              href="/interview"
+              aria-label="Open AI Mock Interview"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                padding: "10px 15px",
+                borderRadius: "12px",
+                border: "1px solid rgba(96, 165, 250, 0.55)",
+                background: "linear-gradient(135deg, #2563eb 0%, #6d28d9 100%)",
+                color: "#ffffff",
+                fontSize: "13px",
+                fontWeight: 700,
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                boxShadow: "0 8px 24px rgba(37, 99, 235, 0.18)",
+              }}
+            >
+              <span aria-hidden="true">✦</span>
+              AI Mock Interview
+              <span aria-hidden="true">↗</span>
+            </a>
+
+            <div style={styles.statusPill}>
+              <span style={styles.statusDot} />
+              {getStatusLabel()}
+            </div>
+          </div>'''
+
+INTERVIEW_PAGE = '''export default function InterviewPage() {
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#070b14",
+        color: "#f8fafc",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <header
+        style={{
+          minHeight: "62px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+          padding: "12px 20px",
+          borderBottom: "1px solid #1e293b",
+          background: "#0b1220",
+          flexWrap: "wrap",
+        }}
+      >
+        <a
+          href="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            color: "#cbd5e1",
+            textDecoration: "none",
+            fontWeight: 650,
+            fontSize: "14px",
+          }}
+        >
+          <span aria-hidden="true">←</span> Back to Cogniview
+        </a>
+        <div style={{ fontSize: "13px", color: "#94a3b8" }}>
+          AI Mock Interview <span style={{ color: "#475569" }}>·</span> Interview workspace
+        </div>
+      </header>
+
+      <iframe
+        src="http://127.0.0.1:8001/"
+        title="Cogniview AI Mock Interview"
+        allow="camera; microphone; autoplay; fullscreen"
+        allowFullScreen
+        style={{
+          display: "block",
+          width: "100%",
+          height: "calc(100vh - 63px)",
+          minHeight: "620px",
+          border: 0,
+          background: "#080c14",
+        }}
+      />
+    </main>
+  );
+}
+'''
+
+
+def main() -> int:
+    root = Path(__file__).resolve().parent
+    if len(sys.argv) > 1:
+        root = Path(sys.argv[1]).expanduser().resolve()
+
+    frontend = root / "gd_app" / "frontend"
+    home_file = frontend / "src" / "app" / "page.tsx"
+    route_dir = frontend / "src" / "app" / "interview"
+    route_file = route_dir / "page.tsx"
+
+    if not home_file.is_file():
+        print(f"ERROR: Could not find the GD homepage: {home_file}")
+        print("Run this script from the Cogniview project root, or pass the root path as an argument.")
+        return 1
+
+    source = home_file.read_text(encoding="utf-8")
+    if 'href="/interview"' in source and "AI Mock Interview" in source:
+        print("The homepage already appears to have an AI Mock Interview link; no change made to it.")
+    else:
+        if NAV_OLD not in source:
+            print("ERROR: Could not find the expected status-pill block in page.tsx.")
+            print("No changes were made. The frontend may have changed since this patch was prepared.")
+            return 1
+        backup = home_file.with_name("page.tsx.before_interview_integration.bak")
+        if not backup.exists():
+            shutil.copy2(home_file, backup)
+        source = source.replace(NAV_OLD, NAV_NEW, 1)
+        home_file.write_text(source, encoding="utf-8")
+        print(f"Updated homepage: {home_file}")
+        print(f"Backup created:   {backup}")
+
+    route_dir.mkdir(parents=True, exist_ok=True)
+    if route_file.exists():
+        existing = route_file.read_text(encoding="utf-8")
+        if 'src="http://127.0.0.1:8001/"' in existing:
+            print(f"Interview route already points to the local interview service: {route_file}")
+        else:
+            print(f"ERROR: Route already exists with different content: {route_file}")
+            print("The homepage link may be present, but the route was not overwritten.")
+            return 1
+    else:
+        route_file.write_text(INTERVIEW_PAGE, encoding="utf-8")
+        print(f"Created route:    {route_file}")
+
+    print("\nIntegration navigation patch applied.")
+    print("Keep the interview service running on http://127.0.0.1:8001.")
+    print("Restart the Next.js frontend if needed, then open http://localhost:3000 and choose AI Mock Interview.")
+    print("This adds navigation only; the full UI/UX redesign can be done after both workflows are verified.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,8 @@
+{
+    "stages": {
+        "speaker_diarization_sec": 15.58,
+        "diarization_postprocessing_sec": 0.04,
+        "acoustic_silence_extraction_sec": 2.68
+    },
+    "total_pipeline_time_sec": 24.72
+}

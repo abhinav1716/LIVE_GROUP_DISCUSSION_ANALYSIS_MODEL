@@ -1,0 +1,1645 @@
+
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import {
+  LocalVideoTrack,
+  RemoteParticipant,
+  RemoteTrack,
+  RemoteTrackPublication,
+  Room,
+  RoomEvent,
+  Track,
+} from "livekit-client";
+
+const API_URL = "http://127.0.0.1:8000";
+const SESSION_ID = 2;
+
+type Session = {
+  id: number;
+  topic: string;
+  description: string | null;
+  scheduled_at: string;
+  duration_minutes: number;
+  max_participants: number;
+  registration_deadline: string;
+  status: string;
+  registered_count: number;
+};
+
+type Participant = {
+  id: number;
+  session_id: number;
+  user_id: string | null;
+  participant_type: string;
+  speaker_id: string;
+  joined_at: string;
+  left_at: string | null;
+};
+
+type ParticipantTileProps = {
+  participant: RemoteParticipant;
+};
+
+function ParticipantTile({ participant }: ParticipantTileProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [videoTrack, setVideoTrack] = useState<RemoteTrack | null>(null);
+  const [audioTrack, setAudioTrack] = useState<RemoteTrack | null>(null);
+
+  useEffect(() => {
+    const handleTrackSubscribed = (
+      track: RemoteTrack,
+      publication: RemoteTrackPublication
+    ) => {
+      if (publication.kind === Track.Kind.Video) {
+        setVideoTrack(track);
+      }
+
+      if (publication.kind === Track.Kind.Audio) {
+        setAudioTrack(track);
+      }
+    };
+
+    const handleTrackUnsubscribed = (
+      track: RemoteTrack,
+      publication: RemoteTrackPublication
+    ) => {
+      if (publication.kind === Track.Kind.Video) {
+        setVideoTrack(null);
+      }
+
+      if (publication.kind === Track.Kind.Audio) {
+        setAudioTrack(null);
+      }
+    };
+
+    participant.on(RoomEvent.TrackSubscribed, handleTrackSubscribed);
+    participant.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed);
+
+    participant.trackPublications.forEach((publication) => {
+      if (publication.isSubscribed && publication.track) {
+        if (publication.kind === Track.Kind.Video) {
+          setVideoTrack(publication.track as RemoteTrack);
+        }
+
+        if (publication.kind === Track.Kind.Audio) {
+          setAudioTrack(publication.track as RemoteTrack);
+        }
+      }
+    });
+
+    return () => {
+      participant.off(RoomEvent.TrackSubscribed, handleTrackSubscribed);
+      participant.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed);
+    };
+  }, [participant]);
+
+  useEffect(() => {
+    if (!videoTrack || !videoRef.current) {
+      return;
+    }
+
+    videoTrack.attach(videoRef.current);
+
+    return () => {
+      if (videoRef.current) {
+        videoTrack.detach(videoRef.current);
+      }
+    };
+  }, [videoTrack]);
+
+  useEffect(() => {
+    if (!audioTrack || !audioRef.current) {
+      return;
+    }
+
+    audioTrack.attach(audioRef.current);
+
+    return () => {
+      if (audioRef.current) {
+        audioTrack.detach(audioRef.current);
+      }
+    };
+  }, [audioTrack]);
+
+  return (
+    <div style={styles.participantTile}>
+      <div style={styles.videoContainer}>
+        {videoTrack ? (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={styles.video}
+          />
+        ) : (
+          <div style={styles.avatar}>
+            {participant.name?.charAt(0).toUpperCase() || "P"}
+          </div>
+        )}
+
+        <div style={styles.participantName}>
+          {participant.name || participant.identity}
+        </div>
+
+        <div style={styles.micIndicator}>🎙️</div>
+      </div>
+
+      <audio ref={audioRef} autoPlay />
+    </div>
+  );
+}
+
+export default function Home() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participantId, setParticipantId] = useState("1");
+  const [room, setRoom] = useState<Room | null>(null);
+
+  const [isInRoom, setIsInRoom] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
+  const [micEnabled, setMicEnabled] = useState(false);
+  const [cameraEnabled, setCameraEnabled] = useState(false);
+
+  const [error, setError] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  const localVideoTrackRef = useRef<LocalVideoTrack | null>(null);
+
+  // Recording references. The pending blob is retained if an upload fails.
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingChunksRef = useRef<Blob[]>([]);
+  const pendingRecordingRef = useRef<Blob | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioDestinationRef =
+    useRef<MediaStreamAudioDestinationNode | null>(null);
+  const audioSourcesRef =
+    useRef<Map<string, MediaStreamAudioSourceNode>>(new Map());
+
+  const loadSession = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/gd/sessions/${SESSION_ID}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load GD session.");
+      }
+
+      const data: Session = await response.json();
+      setSession(data);
+    } catch (err) {
+      console.error(err);
+      setError("Could not connect to the GD backend.");
+    }
+  };
+
+  const loadParticipants = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/gd/sessions/${SESSION_ID}/participants`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load participants.");
+      }
+
+      const data: Participant[] = await response.json();
+      setParticipants(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    void loadSession();
+    void loadParticipants();
+
+    const interval = setInterval(() => {
+      void loadSession();
+      void loadParticipants();
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const attachLocalVideo = (track: LocalVideoTrack) => {
+    if (!localVideoRef.current) {
+      return;
+    }
+
+    track.attach(localVideoRef.current);
+  };
+
+  // Add a local or remote audio track to the recording mix.
+  const addTrackToRecording = (track: RemoteTrack) => {
+    const context = audioContextRef.current;
+    const destination = audioDestinationRef.current;
+
+    if (!context || !destination || track.kind !== Track.Kind.Audio) {
+      return;
+    }
+
+    const mediaTrack = track.mediaStreamTrack;
+    const trackKey = mediaTrack.id;
+
+    if (audioSourcesRef.current.has(trackKey)) {
+      return;
+    }
+
+    const stream = new MediaStream([mediaTrack]);
+    const source = context.createMediaStreamSource(stream);
+
+    source.connect(destination);
+    audioSourcesRef.current.set(trackKey, source);
+  };
+
+  // Start recording once LiveKit and the microphone are connected.
+  const startRoomRecording = async (activeRoom: Room) => {
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      throw new Error("This browser does not support audio recording.");
+    }
+
+    const context = new AudioContext();
+    audioContextRef.current = context;
+
+    try {
+      await context.resume();
+
+      const destination = context.createMediaStreamDestination();
+      audioDestinationRef.current = destination;
+      audioSourcesRef.current.clear();
+
+      // Capture the participant's microphone.
+      const microphonePublication =
+        activeRoom.localParticipant.getTrackPublication(
+          Track.Source.Microphone
+        );
+
+      const microphoneTrack = microphonePublication?.track;
+
+      if (microphoneTrack?.mediaStreamTrack) {
+        const localStream = new MediaStream([
+          microphoneTrack.mediaStreamTrack,
+        ]);
+
+        const localSource = context.createMediaStreamSource(localStream);
+        localSource.connect(destination);
+
+        audioSourcesRef.current.set(
+          `local-${microphoneTrack.mediaStreamTrack.id}`,
+          localSource
+        );
+      }
+
+      // Capture remote participants and AI audio already subscribed.
+      activeRoom.remoteParticipants.forEach((participant) => {
+        participant.trackPublications.forEach((publication) => {
+          if (
+            publication.isSubscribed &&
+            publication.track &&
+            publication.kind === Track.Kind.Audio
+          ) {
+            addTrackToRecording(publication.track as RemoteTrack);
+          }
+        });
+      });
+
+      recordingChunksRef.current = [];
+      pendingRecordingRef.current = null;
+
+      const preferredMimeType = "audio/webm;codecs=opus";
+      const mimeType = MediaRecorder.isTypeSupported(preferredMimeType)
+        ? preferredMimeType
+        : MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : "";
+
+      const recorder = mimeType
+        ? new MediaRecorder(destination.stream, { mimeType })
+        : new MediaRecorder(destination.stream);
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          recordingChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        pendingRecordingRef.current = new Blob(
+          recordingChunksRef.current,
+          { type: recorder.mimeType || "audio/webm" }
+        );
+      };
+
+      mediaRecorderRef.current = recorder;
+      recorder.start(1000);
+      setIsRecording(true);
+    } catch (err) {
+      await context.close().catch(() => {});
+      audioContextRef.current = null;
+      audioDestinationRef.current = null;
+      throw err;
+    }
+  };
+
+  const cleanupRecordingResources = async () => {
+    audioSourcesRef.current.forEach((source) => {
+      try {
+        source.disconnect();
+      } catch {
+        // The source may already be disconnected.
+      }
+    });
+
+    audioSourcesRef.current.clear();
+
+    if (audioContextRef.current) {
+      try {
+        await audioContextRef.current.close();
+      } catch {
+        // The audio context may already be closed.
+      }
+    }
+
+    audioContextRef.current = null;
+    audioDestinationRef.current = null;
+    mediaRecorderRef.current = null;
+    recordingChunksRef.current = [];
+    pendingRecordingRef.current = null;
+
+    setIsRecording(false);
+  };
+
+  // Stop the recorder and upload the resulting audio.
+  // If upload fails, keep the blob so the user can retry.
+  const stopAndUploadRoomRecording = async (
+    activeParticipantId: number
+  ) => {
+    const recorder = mediaRecorderRef.current;
+
+    if (recorder && recorder.state !== "inactive") {
+      await new Promise<void>((resolve, reject) => {
+        const handleStop = () => resolve();
+
+        recorder.addEventListener("stop", handleStop, { once: true });
+
+        try {
+          recorder.stop();
+        } catch (err) {
+          recorder.removeEventListener("stop", handleStop);
+          reject(err);
+        }
+      });
+    }
+
+    setIsRecording(false);
+
+    const blob = pendingRecordingRef.current;
+
+    if (!blob || blob.size === 0) {
+      throw new Error(
+        "No audio recording was captured. Check microphone permissions and try again."
+      );
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+      "file",
+      blob,
+      `gd-session-${SESSION_ID}-participant-${activeParticipantId}.webm`
+    );
+
+    const response = await fetch(
+      `${API_URL}/gd/sessions/${SESSION_ID}/recording?participant_id=${activeParticipantId}`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(result.detail || "The recording upload failed.");
+    }
+
+    // Only clear the recording after the server confirms the upload.
+    await cleanupRecordingResources();
+
+    return result;
+  };
+
+  const joinGD = async () => {
+    setError("");
+    setStatusMessage("");
+
+    const parsedParticipantId = Number(participantId);
+
+    if (!Number.isInteger(parsedParticipantId) || parsedParticipantId <= 0) {
+      setError("Please enter a valid participant ID.");
+      return;
+    }
+
+    if (!session) {
+      setError("GD session information is not available.");
+      return;
+    }
+
+    if (session.status !== "LIVE") {
+      setError(
+        `This GD session is currently ${session.status}. It must be LIVE to join.`
+      );
+      return;
+    }
+
+    try {
+      setIsJoining(true);
+
+      const response = await fetch(
+        `${API_URL}/gd/sessions/${SESSION_ID}/livekit-token?participant_id=${parsedParticipantId}`,
+        { method: "POST" }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Unable to create LiveKit access token."
+        );
+      }
+
+      const newRoom = new Room({
+        adaptiveStream: true,
+        dynacast: true,
+      });
+
+      // Capture audio tracks that are subscribed after recording starts.
+      newRoom.on(
+        RoomEvent.TrackSubscribed,
+        (track: RemoteTrack, publication: RemoteTrackPublication) => {
+          if (publication.kind === Track.Kind.Audio) {
+            addTrackToRecording(track);
+          }
+        }
+      );
+
+      newRoom.on(
+        RoomEvent.ParticipantConnected,
+        (participant: RemoteParticipant) => {
+          console.log("Participant connected:", participant.identity);
+          void loadParticipants();
+        }
+      );
+
+      newRoom.on(
+        RoomEvent.ParticipantDisconnected,
+        (participant: RemoteParticipant) => {
+          console.log("Participant disconnected:", participant.identity);
+          void loadParticipants();
+        }
+      );
+
+      newRoom.on(RoomEvent.Disconnected, () => {
+        console.log("Disconnected from LiveKit room.");
+      });
+
+      await newRoom.connect(data.livekit_url, data.token);
+      await newRoom.localParticipant.setMicrophoneEnabled(true);
+      setMicEnabled(true);
+
+      try {
+        await startRoomRecording(newRoom);
+      } catch (recordingError) {
+        console.error("Unable to start recording:", recordingError);
+
+        await newRoom.localParticipant
+          .setMicrophoneEnabled(false)
+          .catch(() => {});
+
+        newRoom.disconnect();
+
+        throw new Error(
+          recordingError instanceof Error
+            ? `Could not start GD recording: ${recordingError.message}`
+            : "Could not start GD recording."
+        );
+      }
+
+      try {
+        await newRoom.localParticipant.setCameraEnabled(true);
+        setCameraEnabled(true);
+
+        const publication =
+          newRoom.localParticipant.getTrackPublication(
+            Track.Source.Camera
+          );
+
+        if (
+          publication &&
+          publication.track instanceof LocalVideoTrack
+        ) {
+          localVideoTrackRef.current = publication.track;
+
+          setTimeout(() => {
+            if (publication.track instanceof LocalVideoTrack) {
+              attachLocalVideo(publication.track);
+            }
+          }, 100);
+        }
+      } catch (cameraError) {
+        console.warn("Camera could not be enabled:", cameraError);
+        setCameraEnabled(false);
+      }
+
+      setRoom(newRoom);
+      setIsInRoom(true);
+      setStatusMessage(`Connected as ${data.speaker_id}`);
+
+      await loadParticipants();
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to join the GD session."
+      );
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const toggleMicrophone = async () => {
+    if (!room) {
+      return;
+    }
+
+    try {
+      const newState = !micEnabled;
+
+      await room.localParticipant.setMicrophoneEnabled(newState);
+      setMicEnabled(newState);
+    } catch (err) {
+      console.error("Unable to toggle microphone:", err);
+      setError("Could not change microphone state.");
+    }
+  };
+
+  const toggleCamera = async () => {
+    if (!room) {
+      return;
+    }
+
+    try {
+      const newState = !cameraEnabled;
+
+      await room.localParticipant.setCameraEnabled(newState);
+      setCameraEnabled(newState);
+
+      if (newState) {
+        const publication =
+          room.localParticipant.getTrackPublication(Track.Source.Camera);
+
+        if (
+          publication &&
+          publication.track instanceof LocalVideoTrack
+        ) {
+          localVideoTrackRef.current = publication.track;
+
+          setTimeout(() => {
+            if (publication.track instanceof LocalVideoTrack) {
+              attachLocalVideo(publication.track);
+            }
+          }, 100);
+        }
+      }
+    } catch (err) {
+      console.error("Unable to toggle camera:", err);
+      setError("Could not change camera state.");
+    }
+  };
+
+  const leaveGD = async () => {
+    if (isLeaving) {
+      return;
+    }
+
+    setError("");
+    setIsLeaving(true);
+
+    try {
+      if (room) {
+        const parsedParticipantId = Number(participantId);
+
+        if (
+          !Number.isInteger(parsedParticipantId) ||
+          parsedParticipantId <= 0
+        ) {
+          throw new Error("Please enter a valid participant ID.");
+        }
+
+        // Upload before disconnecting, while the participant is still active.
+        await stopAndUploadRoomRecording(parsedParticipantId);
+
+        await room.localParticipant.setCameraEnabled(false);
+        await room.localParticipant.setMicrophoneEnabled(false);
+
+        room.disconnect();
+
+        setStatusMessage(
+          "Recording uploaded successfully. Evaluation has not started yet."
+        );
+      }
+    } catch (err) {
+      console.error("Error while leaving GD:", err);
+
+      setError(
+        err instanceof Error
+          ? `${err.message} Your connection is still open. Click Leave GD again to retry the upload.`
+          : "The recording could not be uploaded. Your connection is still open; try again."
+      );
+
+      return;
+    } finally {
+      setIsLeaving(false);
+    }
+
+    if (localVideoTrackRef.current && localVideoRef.current) {
+      localVideoTrackRef.current.detach(localVideoRef.current);
+    }
+
+    localVideoTrackRef.current = null;
+
+    setRoom(null);
+    setIsInRoom(false);
+    setMicEnabled(false);
+    setCameraEnabled(false);
+  };
+
+  const getStatusLabel = () => {
+    if (!session) {
+      return "Loading...";
+    }
+
+    if (session.status === "LIVE") {
+      return "LIVE";
+    }
+
+    return session.status;
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (isInRoom && room) {
+    const remoteParticipants = Array.from(room.remoteParticipants.values());
+
+    return (
+      <main style={styles.page}>
+        <div style={styles.roomPage}>
+          <header style={styles.roomHeader}>
+            <div>
+              <div style={styles.liveBadge}>
+                <span style={styles.liveDot} />
+                LIVE
+              </div>
+
+              <h1 style={styles.roomTitle}>
+                {session?.topic || "Group Discussion"}
+              </h1>
+
+              <p style={styles.roomSubtitle}>
+                Group Discussion • {session?.duration_minutes || 20} minutes
+              </p>
+
+              <p
+                style={{
+                  ...styles.roomSubtitle,
+                  color: isRecording ? "#4ade80" : "#fbbf24",
+                }}
+              >
+                {isRecording
+                  ? "● Recording discussion audio"
+                  : "Recording is not active"}
+              </p>
+            </div>
+
+            <button
+              onClick={leaveGD}
+              disabled={isLeaving}
+              style={{
+                ...styles.leaveButton,
+                opacity: isLeaving ? 0.65 : 1,
+                cursor: isLeaving ? "wait" : "pointer",
+              }}
+            >
+              {isLeaving ? "Uploading recording..." : "Leave GD"}
+            </button>
+          </header>
+
+          {error && <div style={styles.errorBox}>{error}</div>}
+
+          <section style={styles.roomContent}>
+            <div style={styles.videoGrid}>
+              <div style={styles.participantTile}>
+                <div style={styles.videoContainer}>
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    style={styles.video}
+                  />
+
+                  {!cameraEnabled && (
+                    <div style={styles.avatar}>You</div>
+                  )}
+
+                  <div style={styles.participantName}>You</div>
+
+                  <div style={styles.micIndicator}>
+                    {micEnabled ? "🎙️" : "🔇"}
+                  </div>
+                </div>
+              </div>
+
+              {remoteParticipants.map((participant) => (
+                <ParticipantTile
+                  key={participant.identity}
+                  participant={participant}
+                />
+              ))}
+
+              {remoteParticipants.length === 0 && (
+                <div style={styles.waitingTile}>
+                  <div style={styles.waitingIcon}>👥</div>
+                  <h3>Waiting for other participants</h3>
+                  <p>
+                    Other GD participants will appear here when they join.
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <div style={styles.bottomBar}>
+            <div style={styles.controls}>
+              <button
+                onClick={toggleMicrophone}
+                style={{
+                  ...styles.controlButton,
+                  backgroundColor: micEnabled ? "#1f2937" : "#7f1d1d",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: micEnabled ? "#374151" : "#991b1b",
+                }}
+              >
+                <span style={styles.controlIcon}>
+                  {micEnabled ? "🎙️" : "🔇"}
+                </span>
+                <span>{micEnabled ? "Mute" : "Unmute"}</span>
+              </button>
+
+              <button
+                onClick={toggleCamera}
+                style={{
+                  ...styles.controlButton,
+                  backgroundColor: cameraEnabled ? "#1f2937" : "#7f1d1d",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: cameraEnabled ? "#374151" : "#991b1b",
+                }}
+              >
+                <span style={styles.controlIcon}>
+                  {cameraEnabled ? "📹" : "🚫"}
+                </span>
+                <span>{cameraEnabled ? "Camera On" : "Camera Off"}</span>
+              </button>
+
+              <button
+                onClick={leaveGD}
+                disabled={isLeaving}
+                style={{
+                  ...styles.controlButton,
+                  backgroundColor: "#991b1b",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: "#b91c1c",
+                  opacity: isLeaving ? 0.65 : 1,
+                  cursor: isLeaving ? "wait" : "pointer",
+                }}
+              >
+                <span style={styles.controlIcon}>📞</span>
+                <span>{isLeaving ? "Uploading..." : "Leave"}</span>
+              </button>
+            </div>
+
+            <div style={styles.connectionStatus}>
+              <span style={styles.connectedDot} />
+              Connected
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main style={styles.page}>
+      <div style={styles.lobbyContainer}>
+        <header style={styles.lobbyHeader}>
+          <div>
+            <div style={styles.brand}>COGNIVIEW</div>
+            <div style={styles.brandSubtitle}>
+              AI-Powered Interview Intelligence
+            </div>
+          </div>
+
+          <div style={styles.statusPill}>
+            <span style={styles.statusDot} />
+            {getStatusLabel()}
+          </div>
+        </header>
+
+        {error && <div style={styles.errorBox}>{error}</div>}
+
+        {statusMessage && (
+          <div style={styles.successBox}>{statusMessage}</div>
+        )}
+
+        <section style={styles.heroCard}>
+          <div style={styles.topicSection}>
+            <div style={styles.topicLabel}>GROUP DISCUSSION</div>
+
+            <h1 style={styles.topicTitle}>
+              {session?.topic || "Loading GD Session..."}
+            </h1>
+
+            <p style={styles.topicDescription}>
+              {session?.description ||
+                "Join the live group discussion and interact with other participants."}
+            </p>
+          </div>
+
+          <div style={styles.sessionInfoGrid}>
+            <div style={styles.infoCard}>
+              <div style={styles.infoIcon}>📅</div>
+              <div>
+                <div style={styles.infoLabel}>Scheduled</div>
+                <div style={styles.infoValue}>
+                  {session ? formatDate(session.scheduled_at) : "--"}
+                </div>
+              </div>
+            </div>
+
+            <div style={styles.infoCard}>
+              <div style={styles.infoIcon}>⏱️</div>
+              <div>
+                <div style={styles.infoLabel}>Duration</div>
+                <div style={styles.infoValue}>
+                  {session ? `${session.duration_minutes} minutes` : "--"}
+                </div>
+              </div>
+            </div>
+
+            <div style={styles.infoCard}>
+              <div style={styles.infoIcon}>👥</div>
+              <div>
+                <div style={styles.infoLabel}>Capacity</div>
+                <div style={styles.infoValue}>
+                  {session
+                    ? `${session.registered_count} / ${session.max_participants}`
+                    : "--"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section style={styles.joinCard}>
+          <div style={styles.joinHeader}>
+            <div>
+              <h2 style={styles.joinTitle}>Join Group Discussion</h2>
+              <p style={styles.joinDescription}>
+                Enter your participant ID to enter the live discussion.
+              </p>
+            </div>
+
+            <div style={styles.participantCount}>
+              <strong>{participants.length}</strong>
+              <span>participants</span>
+            </div>
+          </div>
+
+          <div style={styles.formRow}>
+            <div style={styles.inputGroup}>
+              <label style={styles.inputLabel}>Participant ID</label>
+              <input
+                value={participantId}
+                onChange={(event) => setParticipantId(event.target.value)}
+                type="number"
+                min="1"
+                placeholder="Enter participant ID"
+                style={styles.input}
+              />
+            </div>
+
+            <button
+              onClick={joinGD}
+              disabled={
+                isJoining || !session || session.status !== "LIVE"
+              }
+              style={{
+                ...styles.joinButton,
+                opacity:
+                  isJoining || !session || session.status !== "LIVE"
+                    ? 0.5
+                    : 1,
+                cursor:
+                  isJoining || !session || session.status !== "LIVE"
+                    ? "not-allowed"
+                    : "pointer",
+              }}
+            >
+              {isJoining ? "Connecting..." : "Join Discussion →"}
+            </button>
+          </div>
+
+          {session && session.status !== "LIVE" && (
+            <div style={styles.notLiveMessage}>
+              This discussion is currently <strong>{session.status}</strong>.
+              You can join once the session becomes LIVE.
+            </div>
+          )}
+        </section>
+
+        <section style={styles.participantsSection}>
+          <div style={styles.sectionHeader}>
+            <div>
+              <h2 style={styles.sectionTitle}>Participants</h2>
+              <p style={styles.sectionSubtitle}>
+                People currently registered for this discussion
+              </p>
+            </div>
+
+            <button
+              onClick={loadParticipants}
+              style={styles.refreshButton}
+            >
+              ↻ Refresh
+            </button>
+          </div>
+
+          <div style={styles.participantsList}>
+            {participants.length === 0 ? (
+              <div style={styles.emptyState}>No participants found.</div>
+            ) : (
+              participants.map((participant) => (
+                <div key={participant.id} style={styles.participantRow}>
+                  <div style={styles.smallAvatar}>
+                    {participant.participant_type === "AI"
+                      ? "AI"
+                      : participant.user_id?.charAt(0).toUpperCase() || "U"}
+                  </div>
+
+                  <div style={styles.participantDetails}>
+                    <div style={styles.participantUser}>
+                      {participant.user_id || participant.speaker_id}
+                    </div>
+                    <div style={styles.participantSpeaker}>
+                      {participant.speaker_id}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      ...styles.typeBadge,
+                      backgroundColor:
+                        participant.participant_type === "AI"
+                          ? "#312e81"
+                          : "#064e3b",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
+                      borderColor:
+                        participant.participant_type === "AI"
+                          ? "#4338ca"
+                          : "#047857",
+                    }}
+                  >
+                    {participant.participant_type}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <footer style={styles.footer}>
+          <span>Cogniview GD Intelligence System</span>
+          <span>Live discussion powered by WebRTC</span>
+        </footer>
+      </div>
+    </main>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background:
+      "radial-gradient(circle at top, #182033 0%, #080b12 42%, #030508 100%)",
+    color: "#f9fafb",
+    fontFamily:
+      "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    padding: "32px 20px",
+    boxSizing: "border-box",
+  },
+
+  lobbyContainer: {
+    width: "100%",
+    maxWidth: "1100px",
+    margin: "0 auto",
+  },
+
+  lobbyHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "20px",
+    marginBottom: "30px",
+  },
+
+  brand: {
+    fontSize: "24px",
+    fontWeight: 800,
+    letterSpacing: "2px",
+  },
+
+  brandSubtitle: {
+    marginTop: "5px",
+    color: "#9ca3af",
+    fontSize: "13px",
+  },
+
+  statusPill: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "9px 15px",
+    backgroundColor: "#111827",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#374151",
+    borderRadius: "999px",
+    color: "#d1d5db",
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+
+  statusDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: "#22c55e",
+    display: "inline-block",
+  },
+
+  errorBox: {
+    marginBottom: "20px",
+    padding: "14px 16px",
+    backgroundColor: "#450a0a",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#991b1b",
+    borderRadius: "12px",
+    color: "#fecaca",
+    fontSize: "14px",
+  },
+
+  successBox: {
+    marginBottom: "20px",
+    padding: "14px 16px",
+    backgroundColor: "#052e16",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#166534",
+    borderRadius: "12px",
+    color: "#bbf7d0",
+    fontSize: "14px",
+  },
+
+  heroCard: {
+    background:
+      "linear-gradient(145deg, rgba(17,24,39,0.98), rgba(9,12,19,0.98))",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#1f2937",
+    borderRadius: "24px",
+    padding: "34px",
+    marginBottom: "20px",
+    boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
+  },
+
+  topicSection: {
+    marginBottom: "30px",
+  },
+
+  topicLabel: {
+    color: "#818cf8",
+    fontSize: "12px",
+    fontWeight: 700,
+    letterSpacing: "2px",
+    marginBottom: "10px",
+  },
+
+  topicTitle: {
+    margin: 0,
+    fontSize: "36px",
+    lineHeight: 1.15,
+    fontWeight: 800,
+  },
+
+  topicDescription: {
+    marginTop: "14px",
+    marginBottom: 0,
+    maxWidth: "760px",
+    color: "#9ca3af",
+    fontSize: "15px",
+    lineHeight: 1.7,
+  },
+
+  sessionInfoGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "12px",
+  },
+
+  infoCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: "13px",
+    padding: "15px",
+    backgroundColor: "#0b1220",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#1f2937",
+    borderRadius: "14px",
+  },
+
+  infoIcon: {
+    fontSize: "22px",
+  },
+
+  infoLabel: {
+    color: "#6b7280",
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.8px",
+    marginBottom: "4px",
+  },
+
+  infoValue: {
+    color: "#e5e7eb",
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+
+  joinCard: {
+    backgroundColor: "#0b1220",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#1f2937",
+    borderRadius: "20px",
+    padding: "28px",
+    marginBottom: "20px",
+  },
+
+  joinHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "20px",
+    marginBottom: "24px",
+  },
+
+  joinTitle: {
+    margin: 0,
+    fontSize: "21px",
+    fontWeight: 700,
+  },
+
+  joinDescription: {
+    margin: "7px 0 0",
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+
+  participantCount: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "9px 15px",
+    borderRadius: "12px",
+    backgroundColor: "#111827",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#1f2937",
+  },
+
+  formRow: {
+    display: "flex",
+    gap: "12px",
+    alignItems: "end",
+  },
+
+  inputGroup: {
+    flex: 1,
+  },
+
+  inputLabel: {
+    display: "block",
+    marginBottom: "8px",
+    color: "#9ca3af",
+    fontSize: "12px",
+    fontWeight: 600,
+  },
+
+  input: {
+    width: "100%",
+    boxSizing: "border-box",
+    height: "48px",
+    padding: "0 14px",
+    backgroundColor: "#030712",
+    color: "#f9fafb",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#374151",
+    borderRadius: "10px",
+    outline: "none",
+    fontSize: "14px",
+  },
+
+  joinButton: {
+    height: "48px",
+    padding: "0 25px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#6366f1",
+    borderRadius: "10px",
+    backgroundColor: "#4f46e5",
+    color: "#ffffff",
+    fontSize: "14px",
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  },
+
+  notLiveMessage: {
+    marginTop: "15px",
+    padding: "12px",
+    backgroundColor: "#1c1917",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#44403c",
+    borderRadius: "10px",
+    color: "#d6d3d1",
+    fontSize: "13px",
+  },
+
+  participantsSection: {
+    backgroundColor: "#0b1220",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#1f2937",
+    borderRadius: "20px",
+    padding: "25px",
+  },
+
+  sectionHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "20px",
+    marginBottom: "18px",
+  },
+
+  sectionTitle: {
+    margin: 0,
+    fontSize: "19px",
+  },
+
+  sectionSubtitle: {
+    margin: "5px 0 0",
+    color: "#6b7280",
+    fontSize: "12px",
+  },
+
+  refreshButton: {
+    padding: "8px 13px",
+    backgroundColor: "#111827",
+    color: "#d1d5db",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#374151",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+
+  participantsList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+
+  participantRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "11px 13px",
+    backgroundColor: "#080d17",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#172033",
+    borderRadius: "12px",
+  },
+
+  smallAvatar: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+
+  participantDetails: {
+    flex: 1,
+  },
+
+  participantUser: {
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "#e5e7eb",
+  },
+
+  participantSpeaker: {
+    marginTop: "3px",
+    color: "#6b7280",
+    fontSize: "11px",
+  },
+
+  typeBadge: {
+    padding: "5px 9px",
+    borderRadius: "999px",
+    fontSize: "10px",
+    fontWeight: 700,
+  },
+
+  emptyState: {
+    padding: "30px",
+    textAlign: "center",
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "20px",
+    marginTop: "22px",
+    color: "#4b5563",
+    fontSize: "11px",
+  },
+
+  roomPage: {
+    width: "100%",
+    maxWidth: "1400px",
+    margin: "0 auto",
+  },
+
+  roomHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "20px",
+    marginBottom: "22px",
+  },
+
+  liveBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "7px",
+    padding: "6px 10px",
+    backgroundColor: "#450a0a",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#7f1d1d",
+    borderRadius: "999px",
+    color: "#fca5a5",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.7px",
+  },
+
+  liveDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    backgroundColor: "#ef4444",
+    display: "inline-block",
+  },
+
+  roomTitle: {
+    margin: "10px 0 0",
+    fontSize: "28px",
+    fontWeight: 800,
+  },
+
+  roomSubtitle: {
+    margin: "6px 0 0",
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+
+  leaveButton: {
+    padding: "11px 18px",
+    backgroundColor: "#991b1b",
+    color: "#ffffff",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#b91c1c",
+    borderRadius: "9px",
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+
+  roomContent: {
+    minHeight: "calc(100vh - 240px)",
+    display: "flex",
+    alignItems: "center",
+  },
+
+  videoGrid: {
+    width: "100%",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "14px",
+  },
+
+  participantTile: {
+    position: "relative",
+    overflow: "hidden",
+    aspectRatio: "16 / 10",
+    backgroundColor: "#111827",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#273244",
+    borderRadius: "16px",
+  },
+
+  videoContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  },
+
+  video: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+    backgroundColor: "#030712",
+  },
+
+  avatar: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "radial-gradient(circle, #1f2937, #030712)",
+    color: "#d1d5db",
+    fontSize: "26px",
+    fontWeight: 700,
+  },
+
+  participantName: {
+    position: "absolute",
+    left: "10px",
+    bottom: "10px",
+    padding: "6px 9px",
+    backgroundColor: "rgba(0,0,0,0.65)",
+    borderRadius: "7px",
+    fontSize: "11px",
+    fontWeight: 600,
+  },
+
+  micIndicator: {
+    position: "absolute",
+    right: "10px",
+    bottom: "10px",
+    width: "28px",
+    height: "28px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.65)",
+    borderRadius: "50%",
+    fontSize: "13px",
+  },
+
+  waitingTile: {
+    minHeight: "250px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "30px",
+    backgroundColor: "#0b1220",
+    borderWidth: "1px",
+    borderStyle: "dashed",
+    borderColor: "#374151",
+    borderRadius: "16px",
+    color: "#9ca3af",
+  },
+
+  waitingIcon: {
+    fontSize: "35px",
+    marginBottom: "10px",
+  },
+
+  bottomBar: {
+    position: "fixed",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "20px",
+    padding: "14px 20px",
+    backgroundColor: "rgba(3,7,18,0.94)",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: "#1f2937",
+    backdropFilter: "blur(12px)",
+  },
+
+  controls: {
+    display: "flex",
+    gap: "9px",
+  },
+
+  controlButton: {
+    minWidth: "105px",
+    height: "42px",
+    padding: "0 13px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "7px",
+    color: "#ffffff",
+    borderRadius: "9px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontWeight: 600,
+  },
+
+  controlIcon: {
+    fontSize: "15px",
+  },
+
+  connectionStatus: {
+    display: "flex",
+    alignItems: "center",
+    gap: "7px",
+    color: "#9ca3af",
+    fontSize: "11px",
+  },
+
+  connectedDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    backgroundColor: "#22c55e",
+    display: "inline-block",
+  },
+};

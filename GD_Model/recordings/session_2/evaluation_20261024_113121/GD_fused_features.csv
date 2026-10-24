@@ -1,0 +1,2 @@
+speaker,initiation_flag,conclusion_flag,speaking_duration_sec,word_count,points_raised,pauses_taken,avg_pause_duration_sec,total_pause_time_sec,spoke_throughout_gd,turns,average_turn_duration_sec,longest_turn_sec,participation_ratio,transcript_segments,transcript
+SPEAKER_00,1,1,8.69,17,1,0,0.0,0,2,1,8.69,8.69,1.0,1,There will be other participants also joining here after that session gets end up to 20 minutes.

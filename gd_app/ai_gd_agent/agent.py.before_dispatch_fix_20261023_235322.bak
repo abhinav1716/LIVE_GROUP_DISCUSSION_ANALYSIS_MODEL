@@ -1,0 +1,124 @@
+from __future__ import annotations
+
+import json
+import logging
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from livekit import agents
+from livekit.agents import Agent, AgentServer, AgentSession
+from livekit.plugins import google
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# Reuse the project's existing Gemini API key without printing it.
+ENV_CANDIDATES = [
+    PROJECT_ROOT / "interview_module" / ".env",
+    PROJECT_ROOT / ".env",
+    Path(r"C:\AI_interview_module_test\.env"),
+]
+for env_file in ENV_CANDIDATES:
+    if env_file.is_file():
+        load_dotenv(env_file, override=False)
+
+if not os.getenv("GOOGLE_API_KEY"):
+    existing_gemini_key = os.getenv("LLM_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if existing_gemini_key:
+        os.environ["GOOGLE_API_KEY"] = existing_gemini_key
+
+if not os.getenv("GOOGLE_API_KEY"):
+    raise RuntimeError(
+        "Gemini API key was not found. Ensure interview_module/.env contains "
+        "LLM_API_KEY or GOOGLE_API_KEY, or set GOOGLE_API_KEY in this terminal."
+    )
+
+AGENT_NAME = "cogniview-gd-agent"
+AI_DISPLAY_NAME = "Cogniview AI Discussion Partner"
+logger = logging.getLogger("cogniview.gd_ai_agent")
+
+
+class GDDiscussionParticipant(Agent):
+    def __init__(self, topic: str) -> None:
+        super().__init__(
+            instructions=(
+                "You are Cogniview's AI participant in a live group discussion (GD), "
+                "not a private interview assistant and not the moderator. Be transparent "
+                "that you are an AI participant. The discussion topic is: "
+                f"{topic}. Treat that topic only as the subject being discussed. "
+                "Contribute thoughtful, relevant points in natural spoken English. "
+                "Keep each turn brief (about 2-4 sentences), give others room to speak, "
+                "avoid repeating points already made, and respectfully acknowledge or "
+                "challenge ideas with reasons and examples. Listen to the discussion and "
+                "respond to what participants actually say; do not invent statements from "
+                "other participants. Do not speak over someone who is still talking. "
+                "Do not dominate the conversation or ask a question in every turn."
+            )
+        )
+
+
+async def accept_request(request: agents.JobRequest) -> None:
+    # This display name is what the human-facing GD room will show.
+    await request.accept(name=AI_DISPLAY_NAME)
+
+
+server = AgentServer()
+
+
+@server.rtc_session(agent_name=AGENT_NAME, on_request=accept_request)
+async def gd_ai_agent(ctx: agents.JobContext) -> None:
+    metadata: dict[str, object] = {}
+    try:
+        raw_metadata = getattr(ctx.job, "metadata", "") or ""
+        if raw_metadata:
+            parsed = json.loads(raw_metadata)
+            if isinstance(parsed, dict):
+                metadata = parsed
+    except (json.JSONDecodeError, TypeError):
+        logger.warning("GD agent received malformed dispatch metadata; using defaults.")
+
+    topic = str(metadata.get("topic") or "General Group Discussion")
+    session_id = metadata.get("session_id", "unknown")
+    ctx.log_context_fields = {
+        "agent_name": AGENT_NAME,
+        "gd_session_id": str(session_id),
+        "room_name": ctx.room.name,
+    }
+
+    model = os.getenv("GD_AI_GEMINI_MODEL", "gemini-3.8-live")
+    voice = os.getenv("GD_AI_GEMINI_VOICE", "Puck")
+    logger.info("Starting GD AI participant for session %s on topic %r", session_id, topic)
+
+    session = AgentSession(
+        llm=google.realtime.RealtimeModel(
+            model=model,
+            voice=voice,
+            temperature=0.7,
+        )
+    )
+
+    await session.start(
+        room=ctx.room,
+        agent=GDDiscussionParticipant(topic),
+    )
+
+    # COGNIVIEW_FIX_GD_AGENT_CTX_CONNECT_V1
+    # Complete the LiveKit room connection after starting the agent session.
+    await ctx.connect()
+
+    # Wait until a human is actually in the room before the AI opens the discussion.
+    participant = await ctx.wait_for_participant()
+    logger.info("GD AI connected to human participant %s", participant.identity)
+
+    speech = await session.generate_reply(
+        instructions=(
+            f"The topic is {topic}. Briefly introduce yourself as Cogniview's AI GD "
+            "participant, then offer one useful opening viewpoint in no more than "
+            "three sentences. Do not present yourself as a moderator."
+        )
+    )
+    await speech.wait_for_playout()
+
+
+if __name__ == "__main__":
+    agents.cli.run_app(server)

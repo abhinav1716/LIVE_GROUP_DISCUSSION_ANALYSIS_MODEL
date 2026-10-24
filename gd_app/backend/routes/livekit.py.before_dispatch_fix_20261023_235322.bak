@@ -1,0 +1,115 @@
+import asyncio
+import logging
+import os
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from gd_app.backend.database import SessionLocal
+from gd_app.backend.models.participant import GDParticipant, GDParticipantType
+from gd_app.backend.models.session import GDSession, GDSessionStatus
+from gd_app.backend.schemas.livekit import GDLiveKitTokenResponse
+# COGNIVIEW_GD_AI_AGENT_DISPATCH_V1
+from gd_app.backend.services.livekit_service import (
+    generate_participant_token,
+    ensure_gd_ai_agent_dispatched,
+)
+
+
+router = APIRouter(
+    prefix="/gd/sessions",
+    tags=["GD LiveKit"],
+)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@router.post(
+    "/{session_id}/livekit-token",
+    response_model=GDLiveKitTokenResponse,
+)
+def create_livekit_token(
+    session_id: int,
+    participant_id: int,
+    db: Session = Depends(get_db),
+):
+    session = (
+        db.query(GDSession)
+        .filter(GDSession.id == session_id)
+        .first()
+    )
+
+    if session is None:
+        raise HTTPException(
+            status_code=404,
+            detail="GD session not found.",
+        )
+
+    if session.status != GDSessionStatus.LIVE:
+        raise HTTPException(
+            status_code=400,
+            detail="LiveKit access is only available while the GD session is LIVE.",
+        )
+
+    participant = (
+        db.query(GDParticipant)
+        .filter(
+            GDParticipant.id == participant_id,
+            GDParticipant.session_id == session_id,
+            GDParticipant.left_at.is_(None),
+        )
+        .first()
+    )
+
+    if participant is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Active participant not found for this GD session.",
+        )
+
+    room_name = f"gd-session-{session_id}"
+
+    token = generate_participant_token(
+        room_name=room_name,
+        participant_identity=f"participant-{participant.id}",
+        participant_name=participant.speaker_id,
+    )
+
+    livekit_url = os.getenv("LIVEKIT_URL")
+
+    if not livekit_url:
+        raise HTTPException(
+            status_code=500,
+            detail="LIVEKIT_URL is not configured.",
+        )
+
+    # Dispatch runs server-side, so LiveKit API secrets are never sent to the browser.
+    # Failure to start the AI must not prevent a human from joining the GD room.
+    try:
+        asyncio.run(
+            ensure_gd_ai_agent_dispatched(
+                room_name=room_name,
+                session_id=session_id,
+                topic=getattr(session, "topic", None) or "General Group Discussion",
+            )
+        )
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "Could not dispatch GD AI agent to %s; returning the human participant token anyway.",
+            room_name,
+        )
+
+    return GDLiveKitTokenResponse(
+        session_id=session_id,
+        room_name=room_name,
+        participant_id=participant.id,
+        speaker_id=participant.speaker_id,
+        token=token,
+        livekit_url=livekit_url,
+    )

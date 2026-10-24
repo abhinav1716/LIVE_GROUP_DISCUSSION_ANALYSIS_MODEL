@@ -1,0 +1,2 @@
+speaker,turns,average_turn_duration_sec,longest_turn_sec,participation_ratio,transcript_segments,initiation_flag,conclusion_flag,speaking_duration_sec,word_count,points_raised,pauses_taken,avg_pause_duration_sec,total_pause_time_sec,spoke_throughout_gd
+SPEAKER_00,3,2.45,4.24,1.0,4,2.287742606537334,2.342325017260945,-2.460647169889157,-1.955858613479708,0.06817453903015847,-2.530235844988502,-1.9069379614716016,-2.0238674813815556,1.6808059996632296

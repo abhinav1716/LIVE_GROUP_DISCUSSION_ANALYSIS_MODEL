@@ -1,0 +1,241 @@
+=== STDOUT ===
+======================================================================
+GD V3 PRODUCTION INFERENCE TEST
+======================================================================
+
+Selected production candidate : V3
+Test-set MAE                 : 0.3143
+Test-set RMSE                : 0.4220
+Test-set R2                  : 0.8415
+Test-set Pearson             : 0.9188
+
+Device selected : cuda
+========================================================================
+COGNIVIEW GD ISOLATED EVALUATION
+========================================================================
+Audio input       : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_112849.wav
+Evaluation folder : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_112850
+V3 model          : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/GD_Model/models/gd_hybrid_model_v3.pth
+Training scaler   : C:/FINAL_YEAR_PROJECT(COGNIVIEW)/models/scaler.pkl
+Shared dataset    : will not be used for pipeline outputs
+========================================================================
+
+================================================================================
+AI-POWERED INTERVIEW INTELLIGENCE SYSTEM
+================================================================================
+GD PRODUCTION ANALYSIS PIPELINE
+
+Production model : GD Hybrid V3
+Architecture     : BERT + numerical features
+Final scoring    : 70% V3 + 30% analytical
+
+================================================================================
+VALIDATING AUDIO INPUT
+================================================================================
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_112849.wav
+
+Audio size : 0.09 MB
+Audio input : PASS
+
+================================================================================
+VALIDATING PROJECT STRUCTURE
+================================================================================
+Project root : C:\FINAL_YEAR_PROJECT(COGNIVIEW)
+Source dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src
+GD Model dir : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model
+Dataset dir  : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\dataset
+Models dir   : C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models
+
+Production model : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\models\gd_hybrid_model_v3.pth
+
+Production scaler : FOUND
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\models\scaler.pkl
+
+Project structure : PASS
+
+================================================================================
+LOADING GD PRODUCTION COMPONENTS
+================================================================================
+All production components loaded successfully.
+
+================================================================================
+STEP 1: SPEAKER DIARIZATION
+================================================================================
+======================================================================
+INITIALIZING GD SPEAKER DIARIZATION
+======================================================================
+
+CUDA available.
+Using GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+Loading speaker diarization model...
+Diarization device: cuda
+
+Speaker diarization model loaded successfully.
+
+Running speaker diarization...
+Computation device: cuda
+This may take some time for the first run.
+
+Diarization saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_112850\GD_diarization_segments.csv
+
+Speakers detected : 1
+Segments detected : 1
+Time : 15.58 sec
+Status : PASS
+
+================================================================================
+STEP 2: DIARIZATION POST-PROCESSING
+================================================================================
+
+Cleaned diarization saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_112850\GD_diarization_cleaned.csv
+Speaker summary saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_112850\GD_speaker_summary.csv
+
+Original segments : 1
+Removed segments  : 0
+Cleaned segments  : 1
+Speakers          : 1
+Time : 0.04 sec
+Status : PASS
+
+================================================================================
+STEP 3: ACOUSTIC SILENCE EXTRACTION
+================================================================================
+
+======================================================================
+LOADING CLEAN WAV AUDIO
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_112849.wav
+
+Sample rate : 16000 Hz
+Samples     : 45120
+Duration    : 2.82 sec
+
+======================================================================
+CALCULATING AUDIO ENERGY
+======================================================================
+RMS energy calculated.
+
+======================================================================
+RUNNING ACOUSTIC SILENCE DETECTION
+======================================================================
+
+Raw acoustic pauses detected: 0
+
+======================================================================
+GD AUDIO ANALYSIS
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_112849.wav
+
+Silence threshold       : 25 dB
+Minimum pause duration : 0.50 sec
+Merge gap               : 0.50 sec
+
+Recording duration       : 2.82 sec
+Estimated speaking time  : 2.82 sec
+Pauses detected          : 0
+Average pause duration   : 0.00 sec
+Total pause time         : 0.00 sec
+
+======================================================================
+DETECTED ACOUSTIC SILENCE REGIONS
+======================================================================
+No acoustic silence regions detected.
+
+Acoustic silence CSV saved to:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\evaluation_20261024_112850\GD_acoustic_silences.csv
+Rows written: 0
+
+Silence regions : 0
+Time : 2.68 sec
+Status : PASS
+
+================================================================================
+STEP 4: TIMESTAMPED TRANSCRIPTION
+================================================================================
+======================================================================
+INITIALIZING GD TRANSCRIPTION
+======================================================================
+
+Loading Whisper transcription model...
+
+Whisper model loaded successfully in 3.93 seconds.
+Device       : cuda
+Compute type : float16
+
+
+======================================================================
+RUNNING GD TRANSCRIPTION
+======================================================================
+
+Audio file:
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\GD_Model\recordings\session_2\participant_1_auto_20261024_112849.wav
+
+Generating timestamped transcription...
+
+
+======================================================================
+TRANSCRIPTION COMPLETED
+======================================================================
+
+Detected language : en
+Language probability : 1.0000
+Transcription segments : 0
+Processing time : 2.50 seconds
+
+================================================================================
+GD PRODUCTION PIPELINE FAILED
+================================================================================
+Error : Transcription returned zero segments.
+Elapsed time : 24.72 sec
+
+Pipeline stopped.
+
+=== STDERR ===
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py:9: SyntaxWarning: invalid escape sequence '\G'
+  python .\run_gd_evaluation_isolated.py ".\GD_Model\recordings\session_2\participant_1.wav" 2
+W1024 11:29:12.562000 34564 venv\Lib\site-packages\torch\utils\flop_counter.py:29] triton not found; flop counting will not work for triton kernels
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\pyannote\audio\utils\reproducibility.py:74: ReproducibilityWarning: TensorFloat-32 (TF32) has been disabled as it might lead to reproducibility issues and lower accuracy.
+It can be re-enabled by calling
+   >>> import torch
+   >>> torch.backends.cuda.matmul.allow_tf32 = True
+   >>> torch.backends.cudnn.allow_tf32 = True
+See https://github.com/pyannote/pyannote-audio/issues/1370 for more details.
+
+  warnings.warn(
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\pyannote\audio\models\blocks\pooling.py:103: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\ReduceOps.cpp:1858.)
+  std = sequences.std(dim=-1, correction=1)
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\numpy\_core\fromnumeric.py:3862: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\venv\Lib\site-packages\numpy\_core\_methods.py:134: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+Traceback (most recent call last):
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 186, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 152, in main
+    pipeline.main(audio_path=str(audio_path))
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 1644, in main
+    run_transcription(
+    ~~~~~~~~~~~~~~~~~^
+        components,
+        ^^^^^^^^^^^
+        audio_path
+        ^^^^^^^^^^
+    )
+    ^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 851, in run_transcription
+    raise RuntimeError(
+        "Transcription returned zero segments."
+    )
+RuntimeError: Transcription returned zero segments.

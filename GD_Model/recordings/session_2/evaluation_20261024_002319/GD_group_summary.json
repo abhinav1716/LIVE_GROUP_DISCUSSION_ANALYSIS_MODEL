@@ -1,0 +1,33 @@
+{
+  "participants_evaluated": 1,
+  "score_statistics": {
+    "mean": 7.85,
+    "minimum": 7.85,
+    "maximum": 7.85,
+    "median": 7.85
+  },
+  "model_statistics": {
+    "mean_v3_score": 8.45,
+    "mean_analytical_score": 6.46
+  },
+  "top_participant": {
+    "speaker": "SPEAKER_00",
+    "score": 7.85,
+    "rank": 1,
+    "performance_band": "GOOD"
+  },
+  "lowest_participant": {
+    "speaker": "SPEAKER_00",
+    "score": 7.85,
+    "rank": 1,
+    "performance_band": "GOOD"
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "speaker": "SPEAKER_00",
+      "final_score": 7.85,
+      "performance_band": "GOOD"
+    }
+  ]
+}

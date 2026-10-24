@@ -1,0 +1,20 @@
+{
+    "model": "small",
+    "language": "en",
+    "segments": [
+        {
+            "segment_id": 0,
+            "start": 5.17,
+            "end": 12.69,
+            "duration": 7.52,
+            "text": "AI is the future because I think it has really good positive things to do with and all the"
+        },
+        {
+            "segment_id": 1,
+            "start": 12.69,
+            "end": 14.45,
+            "duration": 1.76,
+            "text": "good things can be done with AI."
+        }
+    ]
+}

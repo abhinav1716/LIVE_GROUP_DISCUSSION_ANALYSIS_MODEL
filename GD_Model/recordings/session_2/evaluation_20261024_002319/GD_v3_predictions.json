@@ -1,0 +1,22 @@
+[
+    {
+        "speaker": "SPEAKER_00",
+        "initiation_flag": 1,
+        "conclusion_flag": 1,
+        "speaking_duration_sec": 9.03,
+        "word_count": 26,
+        "points_raised": 1,
+        "pauses_taken": 0,
+        "avg_pause_duration_sec": 0.0,
+        "total_pause_time_sec": 0,
+        "spoke_throughout_gd": 2,
+        "turns": 1,
+        "average_turn_duration_sec": 9.03,
+        "longest_turn_sec": 9.03,
+        "participation_ratio": 1.0,
+        "transcript_segments": 2,
+        "transcript": "AI is the future because I think it has really good positive things to do with and all the good things can be done with AI.",
+        "gd_score": 8.449856758117676,
+        "score_band": "VERY_GOOD"
+    }
+]

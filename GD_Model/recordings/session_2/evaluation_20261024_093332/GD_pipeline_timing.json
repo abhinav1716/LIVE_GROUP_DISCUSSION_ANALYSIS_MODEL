@@ -1,0 +1,16 @@
+{
+    "stages": {
+        "speaker_diarization_sec": 19.89,
+        "diarization_postprocessing_sec": 0.03,
+        "acoustic_silence_extraction_sec": 3.6,
+        "transcription_sec": 19.59,
+        "speaker_transcript_alignment_sec": 0.04,
+        "speaker_feature_extraction_sec": 0.08,
+        "feature_fusion_sec": 0.08,
+        "inference_preprocessing_sec": 0.19,
+        "v3_inference_sec": 10.2,
+        "final_evaluation_sec": 0.11,
+        "report_generation_sec": 0.05
+    },
+    "total_pipeline_time_sec": 53.88
+}

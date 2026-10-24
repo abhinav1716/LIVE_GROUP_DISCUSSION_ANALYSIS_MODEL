@@ -1,0 +1,19 @@
+[
+  {
+    "speaker": "SPEAKER_00",
+    "turns": 1,
+    "average_turn_duration_sec": 9.03,
+    "longest_turn_sec": 9.03,
+    "participation_ratio": 1.0,
+    "transcript_segments": 2,
+    "initiation_flag": 2.287742606537334,
+    "conclusion_flag": 2.342325017260945,
+    "speaking_duration_sec": -2.417303001274378,
+    "word_count": -1.8439353737956043,
+    "points_raised": -1.5281073504564782,
+    "pauses_taken": -2.8574215145990842,
+    "avg_pause_duration_sec": -3.3621529400190875,
+    "total_pause_time_sec": -2.1295360449120593,
+    "spoke_throughout_gd": 1.6808059996632296
+  }
+]

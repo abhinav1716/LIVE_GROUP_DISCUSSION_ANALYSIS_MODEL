@@ -1,0 +1,29 @@
+=== STDOUT ===
+
+=== STDERR ===
+C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py:9: SyntaxWarning: invalid escape sequence '\G'
+  python .\run_gd_evaluation_isolated.py ".\GD_Model\recordings\session_2\participant_1.wav" 2
+Traceback (most recent call last):
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 353, in import_components
+    from speaker_diarization import (
+        GDSpeakerDiarization
+    )
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\speaker_diarization.py", line 3, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 186, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\run_gd_evaluation_isolated.py", line 86, in main
+    components = pipeline.import_components()
+  File "C:\FINAL_YEAR_PROJECT(COGNIVIEW)\src\gd_pipeline.py", line 391, in import_components
+    raise RuntimeError(
+    ...<3 lines>...
+    ) from error
+RuntimeError: Failed to import one or more GD production components.
+
+Original error: No module named 'torch'

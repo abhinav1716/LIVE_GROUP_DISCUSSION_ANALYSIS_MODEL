@@ -1,0 +1,22 @@
+[
+    {
+        "speaker": "SPEAKER_00",
+        "initiation_flag": 1,
+        "conclusion_flag": 1,
+        "speaking_duration_sec": 8.69,
+        "word_count": 17,
+        "points_raised": 1,
+        "pauses_taken": 0,
+        "avg_pause_duration_sec": 0.0,
+        "total_pause_time_sec": 0,
+        "spoke_throughout_gd": 2,
+        "turns": 1,
+        "average_turn_duration_sec": 8.69,
+        "longest_turn_sec": 8.69,
+        "participation_ratio": 1.0,
+        "transcript_segments": 1,
+        "transcript": "There will be other participants also joining here after that session gets end up to 20 minutes.",
+        "gd_score": 8.248932838439941,
+        "score_band": "VERY_GOOD"
+    }
+]
